@@ -12,7 +12,7 @@ constexpr PCTSTR UI_TEXT_START = TEXT("Start");
 constexpr PCTSTR UI_TEXT_HIGHSCORE = TEXT("High Score");
 constexpr PCTSTR UI_TEXT_QUIT = TEXT("Quit");
 
-constexpr POINT PLAYER_INIT_POS = {WND_SIZE.x / 2, WND_SIZE.y - 50};
+constexpr POINT PLAYER_INIT_POS = {WND_SIZE.x / 2, WND_SIZE.y - 100};
 
 constexpr PCTSTR ctStrChara = TEXT("ƒLƒƒƒ‰");
 constexpr PCTSTR ctStrResult = TEXT("GameOver");

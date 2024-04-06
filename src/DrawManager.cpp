@@ -80,6 +80,34 @@ void DrawManager::drawMenu(HDC hdc, RECT* rect)
 }
 
 
+void DrawManager::drawBackground(HDC hdc, RECT* rect)
+{
+
+}
+
+
+void DrawManager::drawPlayer(HDC hdc, RECT* rect)
+{
+	SaveDC(hdc);
+	SetBkMode(hdc, TRANSPARENT);
+	SetTextColor(hdc, RGB(255, 255, 255));
+	TextOut(hdc, this->gm->getPlayerPos().x, this->gm->getPlayerPos().y, TEXT("£"), lstrlen(TEXT("£")));
+	RestoreDC(hdc, -1);
+}
+
+
+void DrawManager::drawEnemy(HDC hdc, RECT* rect)
+{
+
+}
+
+
+void DrawManager::drawShot(HDC hdc, RECT* rect)
+{
+
+}
+
+
 void DrawManager::paint(HDC hdc)
 {
 	RECT rect;
@@ -92,13 +120,30 @@ void DrawManager::paint(HDC hdc)
 		this->drawMenu(hdc, &rect);
 		break;
 	case STATE_GAME:
-		TextOut(hdc, 100, 100, TEXT("GAME"), lstrlen(TEXT("GAME")));
+		this->drawBackground(hdc, &rect);
+		this->drawEnemy(hdc, &rect);
+		this->drawPlayer(hdc, &rect);
+		this->drawShot(hdc, &rect);
 		break;
 	case STATE_HIGHSCORE:
-		TextOut(hdc, 100, 100, TEXT("HIGHSCORE"), lstrlen(TEXT("HIGHSCORE")));
+		this->drawText(
+			hdc, &rect, TEXT("HIGHSCORE"), 30, RGB(255, 255, 255),
+			FW_BOLD, DT_CENTER | DT_SINGLELINE | DT_VCENTER
+		);
+		this->drawText(
+			hdc, &rect, TEXT("Please Enter to Title."), 25, RGB(255, 255, 255),
+			FW_BOLD, DT_CENTER | DT_SINGLELINE
+		);
 		break;
 	case STATE_RESULT:
-		TextOut(hdc, 100, 100, TEXT("RESULT"), lstrlen(TEXT("RESULT")));
+		this->drawText(
+			hdc, &rect, TEXT("RESULT"), 30, RGB(255, 255, 255),
+			FW_BOLD, DT_CENTER | DT_SINGLELINE | DT_VCENTER
+		);
+		this->drawText(
+			hdc, &rect, TEXT("Please Enter to Title."), 25, RGB(255, 255, 255),
+			FW_BOLD, DT_CENTER | DT_SINGLELINE
+		);
 		break;
 	default:
 		break;

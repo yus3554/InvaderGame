@@ -19,7 +19,8 @@ class GameManager
 private:
 	Menu* menu;
 	GameState currentGameState;
-	POINT playerPos;
+	POINT playerPos;  // TODO: キャラクターの場所は、おそらくGM内じゃなくてキャラクタクラス内に書くべき
+	int score;
 
 public:
 	GameManager();
