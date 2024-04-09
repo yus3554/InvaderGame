@@ -43,11 +43,11 @@ bool KeyState::getIsDownStart()
 KeyStateManager::KeyStateManager()
 {
 	// Žæ“¾‚·‚éƒL[‚Ì‰Šú‰»
-	this->statesLength = STATES_LENGTH;
+	this->statesLength = KEYCODE_LENGTH;
 	
-	this->states = (KeyState**)malloc(sizeof(KeyState*) * STATES_LENGTH);
+	this->states = (KeyState**)malloc(sizeof(KeyState*) * KEYCODE_LENGTH);
 
-	for (int keyIndex = 0; keyIndex < STATES_LENGTH; keyIndex++)
+	for (int keyIndex = 0; keyIndex < KEYCODE_LENGTH; keyIndex++)
 	{
 		if (this->states == NULL)
 			throw "states‚ªNULL‚Å‚·";

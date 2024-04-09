@@ -8,6 +8,25 @@
 DrawManager::DrawManager(HWND hwnd)
 {
 	this->hwnd = hwnd;
+
+	// ダブルバッファ設定
+	this->frontHDC = GetDC(hwnd);
+	this->backHDC = CreateCompatibleDC(this->frontHDC);
+	this->backBMP = CreateCompatibleBitmap(this->frontHDC, WND_SIZE.x, WND_SIZE.y);
+	this->oldBMP = (HBITMAP)SelectObject(this->backHDC, this->backBMP);
+}
+
+
+DrawManager::~DrawManager()
+{
+	// ダブルバッファの削除
+	SelectObject(this->backHDC, this->oldBMP);
+	DeleteObject(this->backBMP);
+	DeleteDC(this->backHDC);
+	ReleaseDC(this->hwnd, this->frontHDC);
+
+	// 設定を戻す
+	ChangeDisplaySettings(NULL, NULL);
 }
 
 
@@ -108,46 +127,42 @@ void DrawManager::drawShot(HDC hdc, RECT* rect)
 
 void DrawManager::paint(GameState state, Menu* menu, POINT playerPos, Timer* timer)
 {
-	RECT rect;
-	HDC hdc;
+	RECT rect = {0, 0, WND_SIZE.x, WND_SIZE.y};
 	char fpsStr[10];
 
-	GetClientRect(hwnd, &rect);
-	hdc = GetDC(hwnd);
-
 	// 背景塗りつぶし
-	SelectObject(hdc, GetStockObject(BLACK_BRUSH));
-	Rectangle(hdc, rect.left, rect.top, rect.right, rect.bottom);
+	SelectObject(this->backHDC, GetStockObject(BLACK_BRUSH));
+	Rectangle(this->backHDC, rect.left, rect.top, rect.right, rect.bottom);
 
 	switch (state)
 	{
-	case STATE_TITLE:
-		this->drawTitle(hdc, &rect);
-		this->drawMenu(hdc, &rect, menu);
+	case STATE_TITLE:  // タイトル画面
+		this->drawTitle(this->backHDC, &rect);
+		this->drawMenu(this->backHDC, &rect, menu);
 		break;
-	case STATE_GAME:
-		this->drawBackground(hdc, &rect);
-		this->drawEnemy(hdc, &rect);
-		this->drawPlayer(hdc, &rect, playerPos);
-		this->drawShot(hdc, &rect);
+	case STATE_GAME:  // ゲーム画面
+		this->drawBackground(this->backHDC, &rect);
+		this->drawEnemy(this->backHDC, &rect);
+		this->drawPlayer(this->backHDC, &rect, playerPos);
+		this->drawShot(this->backHDC, &rect);
 		break;
-	case STATE_HIGHSCORE:
+	case STATE_HIGHSCORE:  //ハイスコア画面
 		this->drawText(
-			hdc, &rect, TEXT("HIGHSCORE"), 30, RGB(255, 255, 255),
+			this->backHDC, &rect, TEXT("HIGHSCORE"), 30, RGB(255, 255, 255),
 			FW_BOLD, DT_CENTER | DT_SINGLELINE | DT_VCENTER
 		);
 		this->drawText(
-			hdc, &rect, TEXT("Please Enter to Title."), 25, RGB(255, 255, 255),
+			this->backHDC, &rect, TEXT("Please Enter to Title."), 25, RGB(255, 255, 255),
 			FW_BOLD, DT_CENTER | DT_SINGLELINE
 		);
 		break;
-	case STATE_RESULT:
+	case STATE_RESULT:  // リザルト画面
 		this->drawText(
-			hdc, &rect, TEXT("RESULT"), 30, RGB(255, 255, 255),
+			this->backHDC, &rect, TEXT("RESULT"), 30, RGB(255, 255, 255),
 			FW_BOLD, DT_CENTER | DT_SINGLELINE | DT_VCENTER
 		);
 		this->drawText(
-			hdc, &rect, TEXT("Please Enter to Title."), 25, RGB(255, 255, 255),
+			this->backHDC, &rect, TEXT("Please Enter to Title."), 25, RGB(255, 255, 255),
 			FW_BOLD, DT_CENTER | DT_SINGLELINE
 		);
 		break;
@@ -155,9 +170,11 @@ void DrawManager::paint(GameState state, Menu* menu, POINT playerPos, Timer* tim
 		break;
 	}
 
+	// fps表示
 	snprintf(fpsStr, 10, "%f FPS", timer->getRealFPS());
-	TextOut(hdc, 20, 20, (LPCSTR)fpsStr, lstrlen((LPCSTR)fpsStr));
+	TextOut(this->backHDC, 20, 20, (LPCSTR)fpsStr, lstrlen((LPCSTR)fpsStr));
 
-	ReleaseDC(hwnd, hdc);
+	// ダブルバッファのバック側のHDCをフロント側に転送
+	BitBlt(this->frontHDC, 0, 0, WND_SIZE.x, WND_SIZE.y, this->backHDC, 0, 0, SRCCOPY);
 }
 

@@ -6,7 +6,6 @@
 #include "Timer.h"
 #include "KeyStateManager.h"
 
-
 GameManager::GameManager(HWND hwnd)
 {
 	// 描画を担当するクラス
@@ -24,14 +23,12 @@ GameManager::GameManager(HWND hwnd)
 	this->GameInit();
 }
 
-
 GameManager::~GameManager() {
 	delete this->menu;
 	delete this->dm;
 	delete this->timer;
 	delete this->km;
 }
-
 
 void GameManager::GameInit()
 {
@@ -41,15 +38,10 @@ void GameManager::GameInit()
 	this->playerPos = PLAYER_INIT_POS;
 }
 
-
 void GameManager::GameUpdate()
 {
 	// タイマーアップデート
 	int loop = timer->getDiffFrame();
-
-	// エスケープキー押下 or StateがQuit の場合に終了
-	if (KEYDOWN(VK_ESCAPE) || this->getCurrentGameState() == STATE_QUIT)
-		SendMessage(this->hwnd, WM_CLOSE, 0, 0);
 
 	// メイン処理
 	for (int i = 0; i < loop; i++)
@@ -62,20 +54,17 @@ void GameManager::GameUpdate()
 		this->dm->paint(this->getCurrentGameState(), this->getMenu(), this->getPlayerPos(), this->timer);
 	}
 
-	Sleep(5);
+	Sleep(3);
 }
-
 
 void GameManager::GameQuit()
 {
 
 }
 
-
 GameState GameManager::getCurrentGameState() {
 	return this->currentGameState;
 }
-
 
 void GameManager::setCurrentGameState(GameState state)
 {
@@ -87,7 +76,6 @@ POINT GameManager::getPlayerPos()
 {
 	return this->playerPos;
 }
-
 
 void GameManager::setPlayerPos(POINT pos) {
 	this->playerPos = pos;
