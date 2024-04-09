@@ -44,22 +44,20 @@ Menu* GameManager::getMenu()
 }
 
 
-void GameManager::keyPress(WPARAM wParam)
+void GameManager::keyPress()
 {
 	switch (this->currentGameState)
 	{
 	case STATE_TITLE:  // タイトル画面
-		switch (wParam)
-		{
-		case VK_UP:  // メニューカーソルを上に
+		if (KEYDOWN(VK_UP)) {  // メニューカーソルを上に
 			this->menu->previousItem();
-			break;
+		}
 
-		case VK_DOWN:  // メニューカーソルを下に
+		if (KEYDOWN(VK_DOWN)) {  // メニューカーソルを下に
 			this->menu->nextItem();
-			break;
+		}
 
-		case VK_RETURN:
+		if (KEYDOWN(VK_RETURN)) {
 			// menuのカレントIDに応じて、カレントゲームステートを変更する
 			GameState state;
 			switch (this->menu->getCurrentID())
@@ -80,59 +78,39 @@ void GameManager::keyPress(WPARAM wParam)
 			}
 
 			this->setCurrentGameState(state);
-			break;
-
-		default:
-			break;
 		}
 		break;
 
 	case STATE_GAME:  // ゲーム
 		POINT pos = this->getPlayerPos();
-		switch (wParam)
-		{
-		case VK_LEFT:  // 左に移動
+
+		if (KEYDOWN(VK_LEFT)) {  // 左に移動
 			pos.x -= 10;
 			this->setPlayerPos(pos);
-			break;
+		}
 
-		case VK_RIGHT:  // 右に移動
+		if (KEYDOWN(VK_RIGHT)) {  // 右に移動
 			pos.x += 10;
 			this->setPlayerPos(pos);
-			break;
-
-		case VK_SPACE:  // 弾を打つ
-			break;
-
-		default:
-			break;
 		}
+
+		if (KEYDOWN(VK_SPACE)) {  // 弾を打つ
+		}
+
 		if (pos.x < 0 || pos.x > WND_SIZE.x) {
 			this->setCurrentGameState(STATE_RESULT);
 		}
 		break;
 	
 	case STATE_HIGHSCORE:  // ハイスコア画面
-		switch (wParam)
-		{
-		case VK_RETURN:  // タイトル画面へ遷移
+		if (KEYDOWN(VK_RETURN)) {  // タイトル画面へ遷移
 			this->setCurrentGameState(STATE_TITLE);
-			break;
-
-		default:
-			break;
 		}
 		break;
 
 	case STATE_RESULT:  // リザルト画面
-		switch (wParam)
-		{
-		case VK_RETURN:  // タイトル画面へ遷移
+		if (KEYDOWN(VK_RETURN)) {  // タイトル画面へ遷移
 			this->setCurrentGameState(STATE_TITLE);
-			break;
-
-		default:
-			break;
 		}
 		break;
 

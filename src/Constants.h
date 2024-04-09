@@ -3,10 +3,15 @@
 #include <windows.h>
 
 
+
+#define KEYDOWN(vk_code) ((GetAsyncKeyState(vk_code) & 0x8000) ? 1 : 0)
+#define KEYUP(vk_code)   ((GetAsyncKeyState(vk_code) & 0x8000) ? 0 : 1)
+
+
 #define WND_CLASS_NAME TEXT("WindowClassName")
 #define WND_TITLE TEXT("Invader Game")
 constexpr POINT WND_SIZE = { 720, 480 };
-constexpr PCTSTR UI_TEXT_TITLE = TEXT("インベーダーゲーム");
+constexpr PCTSTR UI_TEXT_TITLE = TEXT("Invader Game");
 
 constexpr PCTSTR UI_TEXT_START = TEXT("Start");
 constexpr PCTSTR UI_TEXT_HIGHSCORE = TEXT("High Score");

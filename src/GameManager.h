@@ -30,6 +30,6 @@ public:
 	POINT getPlayerPos();
 	void setPlayerPos(POINT pos);
 	Menu* getMenu();
-	void keyPress(WPARAM wParam);
+	void keyPress();
 };
 

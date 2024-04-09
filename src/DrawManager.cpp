@@ -33,7 +33,7 @@ void DrawManager::drawText(
 		DEFAULT_PITCH | FF_DONTCARE, //ピッチとファミリ
 		L"メイリオ");			//フォント名
 	hgdi = SelectObject(hdc, font);
-	rect->top += DrawTextW(hdc, text, -1, rect, format);
+	rect->top += DrawText(hdc, text, -1, rect, format);
 	SelectObject(hdc, hgdi);
 	DeleteObject(font);
 
@@ -44,7 +44,7 @@ void DrawManager::drawText(
 void DrawManager::drawTitle(HDC hdc, RECT* rect)
 {
 	this->drawText(
-		hdc, rect, UI_TEXT_TITLE, 30, RGB(255, 255, 255),
+		hdc, rect, UI_TEXT_TITLE, 50, RGB(255, 255, 255),
 		FW_BOLD, DT_CENTER | DT_SINGLELINE | DT_VCENTER
 	);
 }
@@ -61,7 +61,7 @@ void DrawManager::drawMenuItem(HDC hdc, RECT* rect, MenuItem* menuItem)
 	}
 
 	this->drawText(
-		hdc, rect, menuItem->getMenuItemName(), 20, fontColor, FW_BOLD, DT_CENTER
+		hdc, rect, menuItem->getMenuItemName(), 30, fontColor, FW_BOLD, DT_CENTER
 	);
 }
 
@@ -112,6 +112,10 @@ void DrawManager::paint(HDC hdc)
 {
 	RECT rect;
 	GetClientRect(hwnd, &rect);
+
+	// 背景塗りつぶし
+	SelectObject(hdc, GetStockObject(BLACK_BRUSH));
+	Rectangle(hdc, rect.left, rect.top, rect.right, rect.bottom);
 
 	switch (this->gm->getCurrentGameState())
 	{
