@@ -1,30 +1,31 @@
 #pragma once
 #include <windows.h>
 #include "Menu.h"
-
-enum GameState
-{
-	STATE_TITLE,
-	STATE_GAME,
-	STATE_HIGHSCORE,
-	STATE_RESULT,
-	STATE_QUIT,
-	
-	STATE_NUM
-};
+#include "Timer.h"
+#include "DrawManager.h"
+#include "KeyStateManager.h"
 
 
 class GameManager
 {
 private:
 	Menu* menu;
+	Timer* timer;
+	DrawManager* dm;
+	KeyStateManager* km;
+	HWND hwnd;
 	GameState currentGameState;
-	POINT playerPos;  // TODO: キャラクターの場所は、おそらくGM内じゃなくてキャラクタクラス内に書くべき
+	unsigned char downKeys[2];
+
 	int score;
+	POINT playerPos;  // TODO: キャラクターの場所は、おそらくGM内じゃなくてキャラクタクラス内に書くべき
 
 public:
-	GameManager();
+	GameManager(HWND hwnd);
 	~GameManager();
+	void GameInit();
+	void GameUpdate();
+	void GameQuit();
 	GameState getCurrentGameState();
 	void setCurrentGameState(GameState state);
 	POINT getPlayerPos();

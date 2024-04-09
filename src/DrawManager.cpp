@@ -1,11 +1,12 @@
-#include "GameManager.h"
+#include <stdio.h>
 #include "DrawManager.h"
+#include "Menu.h"
+#include "Timer.h"
 #include "Constants.h"
 
 
-DrawManager::DrawManager(GameManager* gm, HWND hwnd)
+DrawManager::DrawManager(HWND hwnd)
 {
-	this->gm = gm;
 	this->hwnd = hwnd;
 }
 
@@ -66,12 +67,9 @@ void DrawManager::drawMenuItem(HDC hdc, RECT* rect, MenuItem* menuItem)
 }
 
 
-void DrawManager::drawMenu(HDC hdc, RECT* rect)
+void DrawManager::drawMenu(HDC hdc, RECT* rect, Menu* menu)
 {
-	Menu* menu;
-
 	rect->top += 20;
-	menu = this->gm->getMenu();
 	for (int menuItemIndex = 0; menuItemIndex < menu->getMenuItemsLength(); menuItemIndex++)
 	{
 		MenuItem* menuItem = menu->getMenuItems()[menuItemIndex];
@@ -86,12 +84,12 @@ void DrawManager::drawBackground(HDC hdc, RECT* rect)
 }
 
 
-void DrawManager::drawPlayer(HDC hdc, RECT* rect)
+void DrawManager::drawPlayer(HDC hdc, RECT* rect, POINT pos)
 {
 	SaveDC(hdc);
 	SetBkMode(hdc, TRANSPARENT);
 	SetTextColor(hdc, RGB(255, 255, 255));
-	TextOut(hdc, this->gm->getPlayerPos().x, this->gm->getPlayerPos().y, TEXT("£"), lstrlen(TEXT("£")));
+	TextOut(hdc, pos.x, pos.y, TEXT("£"), lstrlen(TEXT("£")));
 	RestoreDC(hdc, -1);
 }
 
@@ -108,25 +106,29 @@ void DrawManager::drawShot(HDC hdc, RECT* rect)
 }
 
 
-void DrawManager::paint(HDC hdc)
+void DrawManager::paint(GameState state, Menu* menu, POINT playerPos, Timer* timer)
 {
 	RECT rect;
+	HDC hdc;
+	char fpsStr[10];
+
 	GetClientRect(hwnd, &rect);
+	hdc = GetDC(hwnd);
 
 	// ”wŒi“h‚è‚Â‚Ô‚µ
 	SelectObject(hdc, GetStockObject(BLACK_BRUSH));
 	Rectangle(hdc, rect.left, rect.top, rect.right, rect.bottom);
 
-	switch (this->gm->getCurrentGameState())
+	switch (state)
 	{
 	case STATE_TITLE:
 		this->drawTitle(hdc, &rect);
-		this->drawMenu(hdc, &rect);
+		this->drawMenu(hdc, &rect, menu);
 		break;
 	case STATE_GAME:
 		this->drawBackground(hdc, &rect);
 		this->drawEnemy(hdc, &rect);
-		this->drawPlayer(hdc, &rect);
+		this->drawPlayer(hdc, &rect, playerPos);
 		this->drawShot(hdc, &rect);
 		break;
 	case STATE_HIGHSCORE:
@@ -152,9 +154,10 @@ void DrawManager::paint(HDC hdc)
 	default:
 		break;
 	}
+
+	snprintf(fpsStr, 10, "%f FPS", timer->getRealFPS());
+	TextOut(hdc, 20, 20, (LPCSTR)fpsStr, lstrlen((LPCSTR)fpsStr));
+
+	ReleaseDC(hwnd, hdc);
 }
 
-void DrawManager::repaint()
-{
-	InvalidateRect(this->hwnd, NULL, TRUE);
-}

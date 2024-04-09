@@ -1,18 +1,74 @@
+#include <stdio.h>
+#include <windows.h>
 #include "GameManager.h"
 #include "Constants.h"
 #include "Menu.h"
-#include <windows.h>
+#include "Timer.h"
+#include "KeyStateManager.h"
 
-GameManager::GameManager()
+
+GameManager::GameManager(HWND hwnd)
 {
+	// 描画を担当するクラス
+	this->dm = new DrawManager(hwnd);
+	// タイマー
+	this->timer = new Timer(FPS);
+	// メニュー
 	this->menu = new Menu();
+	// キー入力管理クラス
+	this->km = new KeyStateManager();
+	// ステートの初期化
 	this->currentGameState = STATE_TITLE;
-	this->playerPos = PLAYER_INIT_POS;
+
+	// データの初期化
+	this->GameInit();
 }
 
 
 GameManager::~GameManager() {
 	delete this->menu;
+	delete this->dm;
+	delete this->timer;
+	delete this->km;
+}
+
+
+void GameManager::GameInit()
+{
+	// スコアの初期化
+	this->score = 0;
+	// プレイヤーの初期化
+	this->playerPos = PLAYER_INIT_POS;
+}
+
+
+void GameManager::GameUpdate()
+{
+	// タイマーアップデート
+	int loop = timer->getDiffFrame();
+
+	// エスケープキー押下 or StateがQuit の場合に終了
+	if (KEYDOWN(VK_ESCAPE) || this->getCurrentGameState() == STATE_QUIT)
+		SendMessage(this->hwnd, WM_CLOSE, 0, 0);
+
+	// メイン処理
+	for (int i = 0; i < loop; i++)
+	{
+		// キー入力アップデート
+		this->km->update();
+
+		// 描画
+		this->keyPress();
+		this->dm->paint(this->getCurrentGameState(), this->getMenu(), this->getPlayerPos(), this->timer);
+	}
+
+	Sleep(5);
+}
+
+
+void GameManager::GameQuit()
+{
+
 }
 
 
@@ -49,22 +105,22 @@ void GameManager::keyPress()
 	switch (this->currentGameState)
 	{
 	case STATE_TITLE:  // タイトル画面
-		if (KEYDOWN(VK_UP)) {  // メニューカーソルを上に
+		if (this->km->getKeyState(VK_UP)->getIsDownStart()) {  // メニューカーソルを上に
 			this->menu->previousItem();
 		}
 
-		if (KEYDOWN(VK_DOWN)) {  // メニューカーソルを下に
+		if (this->km->getKeyState(VK_DOWN)->getIsDownStart()) {  // メニューカーソルを下に
 			this->menu->nextItem();
 		}
 
-		if (KEYDOWN(VK_RETURN)) {
+		if (this->km->getKeyState(VK_RETURN)->getIsDownStart()) {
 			// menuのカレントIDに応じて、カレントゲームステートを変更する
 			GameState state;
 			switch (this->menu->getCurrentID())
 			{
 			case MENU_START:
 				state = STATE_GAME;
-				// TODO: プレイヤーやキャラクターのイニシャライズ
+				this->GameInit();
 				break;
 			case MENU_HIGHSCORE:
 				state = STATE_HIGHSCORE;
@@ -84,17 +140,17 @@ void GameManager::keyPress()
 	case STATE_GAME:  // ゲーム
 		POINT pos = this->getPlayerPos();
 
-		if (KEYDOWN(VK_LEFT)) {  // 左に移動
+		if (this->km->getKeyState(VK_LEFT)->getIsDownCurrent()) {  // 左に移動
 			pos.x -= 10;
 			this->setPlayerPos(pos);
 		}
 
-		if (KEYDOWN(VK_RIGHT)) {  // 右に移動
+		if (this->km->getKeyState(VK_RIGHT)->getIsDownCurrent()) {  // 右に移動
 			pos.x += 10;
 			this->setPlayerPos(pos);
 		}
 
-		if (KEYDOWN(VK_SPACE)) {  // 弾を打つ
+		if (this->km->getKeyState(VK_SPACE)->getIsDownStart()) {  // 弾を打つ
 		}
 
 		if (pos.x < 0 || pos.x > WND_SIZE.x) {
@@ -103,13 +159,13 @@ void GameManager::keyPress()
 		break;
 	
 	case STATE_HIGHSCORE:  // ハイスコア画面
-		if (KEYDOWN(VK_RETURN)) {  // タイトル画面へ遷移
+		if (this->km->getKeyState(VK_RETURN)->getIsDownStart()) {  // タイトル画面へ遷移
 			this->setCurrentGameState(STATE_TITLE);
 		}
 		break;
 
 	case STATE_RESULT:  // リザルト画面
-		if (KEYDOWN(VK_RETURN)) {  // タイトル画面へ遷移
+		if (this->km->getKeyState(VK_RETURN)->getIsDownStart()) {  // タイトル画面へ遷移
 			this->setCurrentGameState(STATE_TITLE);
 		}
 		break;

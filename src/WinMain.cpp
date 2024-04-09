@@ -3,6 +3,7 @@
 #include "Constants.h"
 #include "DrawManager.h"
 #include "GameManager.h"
+#include "Timer.h"
 
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -63,23 +64,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pCmdLine, 
 	);
 	if (hwnd == NULL) return 0;
 
-	// ゲームの状態や様々な値を管理するクラス
-	GameManager* gm = new GameManager();
-	// 描画を担当するクラス
-	DrawManager* dm = new DrawManager(gm, hwnd);
-
-	HDC hdc;
-
-	// 時間計測
-	int fps = 240;
-	int loop;
-	int nowFrame;
-	int beforeFrame = 0;
-	LARGE_INTEGER cpuFreq;  // CPU周波数
-	QueryPerformanceFrequency(&cpuFreq);
-	LARGE_INTEGER startCount;
-	LARGE_INTEGER nowCount;
-	QueryPerformanceCounter(&startCount);
+	// ゲームを管理するクラス
+	GameManager* gm = new GameManager(hwnd);
+	gm->GameInit();
 
 	// メッセージループ（WM_QUIT時のみループを抜ける）
 	while (true)
@@ -92,46 +79,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pCmdLine, 
 			DispatchMessage(&msg);
 		}
 		else {
-
-			// エスケープキー押下 or StateがQuit の場合に終了
-			if(KEYDOWN(VK_ESCAPE) || gm->getCurrentGameState() == STATE_QUIT)
-				SendMessage(hwnd, WM_CLOSE, 0, 0);
-
-			// キー入力
-			// TODO: ここでkeyが押されるたびに内部の値を変えてしまうと、ループのスピード次第で変わってしまう
-			// TODO: つまり、CPUの性能が良いほど早く動ける
-			// TODO: かといって、keyPressをforの中にいれると、forに入っている間しかkeyを取れない
-			// TODO: そこで、keyPressは取り続けつつ、実際に値が動くのはforに入ったときだけにしたほうがいい
-			// TODO: keyPressに入るたびに現在押されているKeyを更新しつづける
-			// TODO: forに入ったときに、現在押されているKeyを取得して実行する
-			gm->keyPress();
-
-			// フレームレート計算
-			QueryPerformanceCounter(&nowCount);
-			nowFrame = (int)((nowCount.QuadPart - startCount.QuadPart) / (cpuFreq.QuadPart / fps));
-			if (nowFrame != beforeFrame) {
-				loop = nowFrame - beforeFrame;
-				beforeFrame = nowFrame;
-			}
-			else {
-				loop = 0;
-			}
-
-			// メイン処理
-			for (int i = 0; i < loop; i++)
-			{
-				// TODO: キー入力の処理もこっちで行う
-				// TODO: カーソルの速度が早くなりすぎるので、一つ前のフレームと同じキーが押されていたら無視するようにしたほうがいい
-				hdc = GetDC(hwnd);
-				dm->paint(hdc);
-				ReleaseDC(hwnd, hdc);
-			}
-
-			Sleep(3);
+			gm->GameUpdate();
 		}
 	}
+
+	gm->GameQuit();
 	delete gm;
-	delete dm;
 
 	return msg.wParam;
 }

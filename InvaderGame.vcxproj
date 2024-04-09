@@ -127,16 +127,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\KeyStateManager.cpp" />
     <ClCompile Include="src\DrawManager.cpp" />
     <ClCompile Include="src\GameManager.cpp" />
     <ClCompile Include="src\Menu.cpp" />
     <ClCompile Include="src\Constants.h" />
     <ClCompile Include="src\WinMain.cpp" />
+    <ClCompile Include="src\Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\KeyStateManager.h" />
     <ClInclude Include="src\DrawManager.h" />
     <ClInclude Include="src\GameManager.h" />
     <ClInclude Include="src\Menu.h" />
+    <ClInclude Include="src\Timer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
