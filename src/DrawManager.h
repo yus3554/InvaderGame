@@ -31,6 +31,11 @@ private:
 	/// 
 	/// </summary>
 	HBITMAP oldBMP;
+
+	/// <summary>
+	/// インスタンスハンドル
+	/// </summary>
+	HINSTANCE hInstance;
 	
 	/// <summary>
 	/// テキスト表示する
@@ -96,12 +101,21 @@ private:
 	/// <param name="rect">ウィンドウサイズ</param>
 	void drawShot(HDC hdc, RECT* rect);
 
+	/// <summary>
+	/// FPS値を表示
+	/// </summary>
+	/// <param name="hdc">デバイスコンテキスト</param>
+	/// <param name="rect">ウィンドウサイズ</param>
+	/// <param name="timer">タイマー</param>
+	void drawFPS(HDC hdc, RECT* rect, Timer* timer);
+
 public:
 	/// <summary>
 	/// コンストラクタ
 	/// </summary>
 	/// <param name="hwnd">ウィンドウ</param>
-	DrawManager(HWND hwnd);
+	/// <param name="hInstance">インスタンスハンドル</param>
+	DrawManager(HWND hwnd, HINSTANCE hInstance);
 
 	/// <summary>
 	/// デストラクタ

@@ -3,17 +3,20 @@
 #include "Menu.h"
 #include "Timer.h"
 #include "Constants.h"
+#include "resource.h"
 
 
-DrawManager::DrawManager(HWND hwnd)
+DrawManager::DrawManager(HWND hwnd, HINSTANCE hInstance)
 {
 	this->hwnd = hwnd;
+	this->hInstance = hInstance;
 
 	// ダブルバッファ設定
 	this->frontHDC = GetDC(hwnd);
 	this->backHDC = CreateCompatibleDC(this->frontHDC);
-	this->backBMP = CreateCompatibleBitmap(this->frontHDC, WND_SIZE.x, WND_SIZE.y);
-	this->oldBMP = (HBITMAP)SelectObject(this->backHDC, this->backBMP);
+	// this->backBMP = CreateCompatibleBitmap(this->frontHDC, WND_SIZE.x, WND_SIZE.y);
+	// this->backBMP = LoadBitmap(hInstance, MAKEINTRESOURCE(IDB_BITMAP1));
+	// this->oldBMP = (HBITMAP)SelectObject(this->backHDC, this->backBMP);
 }
 
 
@@ -99,7 +102,8 @@ void DrawManager::drawMenu(HDC hdc, RECT* rect, Menu* menu)
 
 void DrawManager::drawBackground(HDC hdc, RECT* rect)
 {
-
+	this->backBMP = LoadBitmap(this->hInstance, MAKEINTRESOURCE(IDB_BITMAP1));
+	this->oldBMP = (HBITMAP)SelectObject(this->backHDC, this->backBMP);
 }
 
 
@@ -124,15 +128,22 @@ void DrawManager::drawShot(HDC hdc, RECT* rect)
 
 }
 
+void DrawManager::drawFPS(HDC hdc, RECT* rect, Timer* timer)
+{
+	// FPS表示用
+	char fpsStr[20];
+	snprintf(fpsStr, 20, "%3.3f FPS", timer->getRealFPS());
+	TextOut(this->backHDC, 0, 0, (LPCSTR)fpsStr, lstrlen((LPCSTR)fpsStr));
+}
+
 
 void DrawManager::paint(GameState state, Menu* menu, POINT playerPos, Timer* timer)
 {
+	// ウィンドウサイズ
 	RECT rect = {0, 0, WND_SIZE.x, WND_SIZE.y};
-	char fpsStr[10];
 
-	// 背景塗りつぶし
-	SelectObject(this->backHDC, GetStockObject(BLACK_BRUSH));
-	Rectangle(this->backHDC, rect.left, rect.top, rect.right, rect.bottom);
+	// 背景
+	this->drawBackground(this->backHDC, &rect);
 
 	switch (state)
 	{
@@ -140,12 +151,13 @@ void DrawManager::paint(GameState state, Menu* menu, POINT playerPos, Timer* tim
 		this->drawTitle(this->backHDC, &rect);
 		this->drawMenu(this->backHDC, &rect, menu);
 		break;
+
 	case STATE_GAME:  // ゲーム画面
-		this->drawBackground(this->backHDC, &rect);
 		this->drawEnemy(this->backHDC, &rect);
 		this->drawPlayer(this->backHDC, &rect, playerPos);
 		this->drawShot(this->backHDC, &rect);
 		break;
+
 	case STATE_HIGHSCORE:  //ハイスコア画面
 		this->drawText(
 			this->backHDC, &rect, TEXT("HIGHSCORE"), 30, RGB(255, 255, 255),
@@ -156,6 +168,7 @@ void DrawManager::paint(GameState state, Menu* menu, POINT playerPos, Timer* tim
 			FW_BOLD, DT_CENTER | DT_SINGLELINE
 		);
 		break;
+
 	case STATE_RESULT:  // リザルト画面
 		this->drawText(
 			this->backHDC, &rect, TEXT("RESULT"), 30, RGB(255, 255, 255),
@@ -166,13 +179,13 @@ void DrawManager::paint(GameState state, Menu* menu, POINT playerPos, Timer* tim
 			FW_BOLD, DT_CENTER | DT_SINGLELINE
 		);
 		break;
+
 	default:
 		break;
 	}
 
 	// fps表示
-	snprintf(fpsStr, 10, "%f FPS", timer->getRealFPS());
-	TextOut(this->backHDC, 20, 20, (LPCSTR)fpsStr, lstrlen((LPCSTR)fpsStr));
+	this->drawFPS(this->backHDC, &rect, timer);
 
 	// ダブルバッファのバック側のHDCをフロント側に転送
 	BitBlt(this->frontHDC, 0, 0, WND_SIZE.x, WND_SIZE.y, this->backHDC, 0, 0, SRCCOPY);

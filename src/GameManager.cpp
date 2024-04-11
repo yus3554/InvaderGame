@@ -6,10 +6,10 @@
 #include "Timer.h"
 #include "KeyStateManager.h"
 
-GameManager::GameManager(HWND hwnd)
+GameManager::GameManager(HWND hwnd, HINSTANCE hInstance)
 {
 	// 描画を担当するクラス
-	this->dm = new DrawManager(hwnd);
+	this->dm = new DrawManager(hwnd, hInstance);
 	// タイマー
 	this->timer = new Timer(FPS);
 	// メニュー
@@ -48,13 +48,14 @@ void GameManager::GameUpdate()
 	{
 		// キー入力アップデート
 		this->km->update();
-
-		// 描画
+		// キー入力による処理
 		this->keyPress();
+		// 描画
 		this->dm->paint(this->getCurrentGameState(), this->getMenu(), this->getPlayerPos(), this->timer);
 	}
 
-	Sleep(3);
+	// TODO: やっぱ待たないとCPU使用率がやばい
+	Sleep(1);
 }
 
 void GameManager::GameQuit()

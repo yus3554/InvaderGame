@@ -14,18 +14,22 @@
 /// 指定されたキーが離されているかどうかを取得
 #define KEYUP(vk_code)   ((GetAsyncKeyState(vk_code) & 0x8000) ? 0 : 1)
 
-/// ウィンドウクラスの名前
-#define WND_CLASS_NAME TEXT("WindowClassName")
-
-/// ウィンドウタイトル
-#define WND_TITLE TEXT("Invader Game")
-
 
 /// ####################################################
 ///
 /// 定数
 /// 
 /// ####################################################
+
+/// <summary>
+/// ウィンドウクラスの名前
+/// </summary>
+constexpr PCTSTR WND_CLASS_NAME = TEXT("WindowClassName");
+
+/// /// <summary>
+/// ウィンドウタイトル
+/// </summary>
+constexpr PCTSTR WND_TITLE = TEXT("Invader Game");
 
 /// <summary>
 /// ウィンドウサイズ

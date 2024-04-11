@@ -72,7 +72,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pCmdLine, 
 	if (hwnd == NULL) return 0;
 
 	// ƒQ[ƒ€‚ðŠÇ—‚·‚éƒNƒ‰ƒX
-	GameManager* gm = new GameManager(hwnd);
+	GameManager* gm = new GameManager(hwnd, hInstance);
 	// ƒQ[ƒ€‰Šú‰»
 	gm->GameInit();
 

@@ -35,6 +35,11 @@ private:
 	HWND hwnd;
 
 	/// <summary>
+	/// インスタンスハンドル
+	/// </summary>
+	HINSTANCE hInstance;
+
+	/// <summary>
 	/// 現在のゲームステート
 	/// </summary>
 	GameState currentGameState;
@@ -54,7 +59,8 @@ public:
 	/// コンストラクタ
 	/// </summary>
 	/// <param name="hwnd">ウィンドウ</param>
-	GameManager(HWND hwnd);
+	/// <param name="hInstance">インスタンスハンドル</param>
+	GameManager(HWND hwnd, HINSTANCE hInstance);
 
 	/// <summary>
 	/// デストラクタ
