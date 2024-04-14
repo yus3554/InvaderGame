@@ -1,5 +1,5 @@
 #include "Timer.h"
-#include <windows.h>
+
 
 Timer::Timer(int targetFPS) {
 	this->targetFPS = targetFPS;

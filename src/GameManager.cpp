@@ -1,10 +1,4 @@
-#include <stdio.h>
-#include <windows.h>
 #include "GameManager.h"
-#include "Constants.h"
-#include "Menu.h"
-#include "Timer.h"
-#include "KeyStateManager.h"
 
 GameManager::GameManager(HWND hwnd, HINSTANCE hInstance)
 {
@@ -13,7 +7,7 @@ GameManager::GameManager(HWND hwnd, HINSTANCE hInstance)
 	// タイマー
 	this->timer = new Timer(FPS);
 	// メニュー
-	this->menu = new Menu();
+	this->mm = new MenuManager();
 	// キー入力管理クラス
 	this->km = new KeyStateManager();
 	// ステートの初期化
@@ -24,7 +18,7 @@ GameManager::GameManager(HWND hwnd, HINSTANCE hInstance)
 }
 
 GameManager::~GameManager() {
-	delete this->menu;
+	delete this->mm;
 	delete this->dm;
 	delete this->timer;
 	delete this->km;
@@ -51,7 +45,7 @@ void GameManager::GameUpdate()
 		// キー入力による処理
 		this->keyPress();
 		// 描画
-		this->dm->paint(this->getCurrentGameState(), this->getMenu(), this->getPlayerPos(), this->timer);
+		this->dm->paint(this->getCurrentGameState(), this->getMenuManager(), this->getPlayerPos(), this->timer);
 	}
 
 	// TODO: やっぱ待たないとCPU使用率がやばい
@@ -83,9 +77,9 @@ void GameManager::setPlayerPos(POINT pos) {
 }
 
 
-Menu* GameManager::getMenu()
+MenuManager* GameManager::getMenuManager()
 {
-	return this->menu;
+	return this->mm;
 }
 
 
@@ -95,17 +89,17 @@ void GameManager::keyPress()
 	{
 	case STATE_TITLE:  // タイトル画面
 		if (this->km->getKeyState(VK_UP)->getIsDownStart()) {  // メニューカーソルを上に
-			this->menu->previousItem();
+			this->mm->previousItem();
 		}
 
 		if (this->km->getKeyState(VK_DOWN)->getIsDownStart()) {  // メニューカーソルを下に
-			this->menu->nextItem();
+			this->mm->nextItem();
 		}
 
 		if (this->km->getKeyState(VK_RETURN)->getIsDownStart()) {
 			// menuのカレントIDに応じて、カレントゲームステートを変更する
 			GameState state;
-			switch (this->menu->getCurrentID())
+			switch (this->mm->getCurrentID())
 			{
 			case MENU_START:
 				state = STATE_GAME;

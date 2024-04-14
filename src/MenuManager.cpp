@@ -1,6 +1,4 @@
-#include <windows.h>
-#include "Menu.h"
-#include "Constants.h"
+#include "MenuManager.h"
 
 
 MenuItem::MenuItem(
@@ -37,7 +35,7 @@ PCTSTR MenuItem::getMenuItemName()
 }
 
 
-Menu::Menu()
+MenuManager::MenuManager()
 {
 	// メニューアイテムの初期化
 	this->menuItemsLength = MENU_ITEM_ID_NUM;
@@ -55,7 +53,7 @@ Menu::Menu()
 }
 
 
-Menu::~Menu()
+MenuManager::~MenuManager()
 {
 	for (int menuItemsIndex = 0; menuItemsIndex < this->menuItemsLength; menuItemsIndex++) {
 		delete this->menuItems[menuItemsIndex];
@@ -64,7 +62,7 @@ Menu::~Menu()
 }
 
 
-void Menu::setCurrentSelectItems()
+void MenuManager::setCurrentSelectItems()
 {
 	for (int menuItemIndex = 0; menuItemIndex < MENU_ITEM_ID_NUM; menuItemIndex++)
 	{
@@ -79,7 +77,7 @@ void Menu::setCurrentSelectItems()
 }
 
 
-void Menu::nextItem()
+void MenuManager::nextItem()
 {
 	if (this->currentID + 1 >= MENU_ITEM_ID_NUM) {
 		this->currentID = MENU_START;
@@ -92,7 +90,7 @@ void Menu::nextItem()
 }
 
 
-void Menu::previousItem()
+void MenuManager::previousItem()
 {
 	if (this->currentID - 1 < 0) {
 		this->currentID = static_cast<MenuItemID>(MENU_ITEM_ID_NUM - 1);
@@ -105,19 +103,19 @@ void Menu::previousItem()
 }
 
 
-MenuItemID Menu::getCurrentID()
+MenuItemID MenuManager::getCurrentID()
 {
 	return this->currentID;
 }
 
 
-MenuItem** Menu::getMenuItems()
+MenuItem** MenuManager::getMenuItems()
 {
 	return this->menuItems;
 }
 
 
-int Menu::getMenuItemsLength()
+int MenuManager::getMenuItemsLength()
 {
 	return this->menuItemsLength;
 }

@@ -44,7 +44,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 /// <param name="pCmdLine"></param>
 /// <param name="nCmdShow"></param>
 /// <returns></returns>
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pCmdLine, int nCmdShow)
+int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nShowCmd)
 {
 	HWND hwnd;
 	WNDCLASS winc{};
@@ -102,5 +102,5 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pCmdLine, 
 	gm->GameQuit();
 	delete gm;
 
-	return msg.wParam;
+	return (int)msg.wParam;
 }

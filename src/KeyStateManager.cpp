@@ -1,6 +1,4 @@
-#include <windows.h>
 #include "KeyStateManager.h"
-#include "Constants.h"
 
 
 KeyState::KeyState(int keyCode)
@@ -32,11 +30,7 @@ bool KeyState::getIsDownCurrent()
 
 bool KeyState::getIsDownStart()
 {
-	if (this->isDownCurrent && !this->isDownBefore)
-	{
-		return true;
-	}
-	return false;
+	return this->isDownCurrent && !this->isDownBefore;
 }
 
 

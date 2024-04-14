@@ -1,9 +1,5 @@
 #include <stdio.h>
 #include "DrawManager.h"
-#include "Menu.h"
-#include "Timer.h"
-#include "Constants.h"
-#include "resource.h"
 
 
 DrawManager::DrawManager(HWND hwnd, HINSTANCE hInstance)
@@ -15,8 +11,8 @@ DrawManager::DrawManager(HWND hwnd, HINSTANCE hInstance)
 	this->frontHDC = GetDC(hwnd);
 	this->backHDC = CreateCompatibleDC(this->frontHDC);
 	// this->backBMP = CreateCompatibleBitmap(this->frontHDC, WND_SIZE.x, WND_SIZE.y);
-	// this->backBMP = LoadBitmap(hInstance, MAKEINTRESOURCE(IDB_BITMAP1));
-	// this->oldBMP = (HBITMAP)SelectObject(this->backHDC, this->backBMP);
+	this->backBMP = LoadBitmap(hInstance, MAKEINTRESOURCE(IDB_BITMAP1));
+	this->oldBMP = (HBITMAP)SelectObject(this->backHDC, this->backBMP);
 }
 
 
@@ -89,12 +85,12 @@ void DrawManager::drawMenuItem(HDC hdc, RECT* rect, MenuItem* menuItem)
 }
 
 
-void DrawManager::drawMenu(HDC hdc, RECT* rect, Menu* menu)
+void DrawManager::drawMenu(HDC hdc, RECT* rect, MenuManager* mm)
 {
 	rect->top += 20;
-	for (int menuItemIndex = 0; menuItemIndex < menu->getMenuItemsLength(); menuItemIndex++)
+	for (int menuItemIndex = 0; menuItemIndex < mm->getMenuItemsLength(); menuItemIndex++)
 	{
-		MenuItem* menuItem = menu->getMenuItems()[menuItemIndex];
+		MenuItem* menuItem = mm->getMenuItems()[menuItemIndex];
 		this->drawMenuItem(hdc, rect, menuItem);
 	}
 }
@@ -137,7 +133,7 @@ void DrawManager::drawFPS(HDC hdc, RECT* rect, Timer* timer)
 }
 
 
-void DrawManager::paint(GameState state, Menu* menu, POINT playerPos, Timer* timer)
+void DrawManager::paint(GameState state, MenuManager* mm, POINT playerPos, Timer* timer)
 {
 	// ウィンドウサイズ
 	RECT rect = {0, 0, WND_SIZE.x, WND_SIZE.y};
@@ -149,7 +145,7 @@ void DrawManager::paint(GameState state, Menu* menu, POINT playerPos, Timer* tim
 	{
 	case STATE_TITLE:  // タイトル画面
 		this->drawTitle(this->backHDC, &rect);
-		this->drawMenu(this->backHDC, &rect, menu);
+		this->drawMenu(this->backHDC, &rect, mm);
 		break;
 
 	case STATE_GAME:  // ゲーム画面

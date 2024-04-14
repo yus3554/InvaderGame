@@ -130,7 +130,7 @@
     <ClCompile Include="src\KeyStateManager.cpp" />
     <ClCompile Include="src\DrawManager.cpp" />
     <ClCompile Include="src\GameManager.cpp" />
-    <ClCompile Include="src\Menu.cpp" />
+    <ClCompile Include="src\MenuManager.cpp" />
     <ClCompile Include="src\Constants.h" />
     <ClCompile Include="src\WinMain.cpp" />
     <ClCompile Include="src\Timer.cpp" />
@@ -140,7 +140,7 @@
     <ClInclude Include="src\KeyStateManager.h" />
     <ClInclude Include="src\DrawManager.h" />
     <ClInclude Include="src\GameManager.h" />
-    <ClInclude Include="src\Menu.h" />
+    <ClInclude Include="src\MenuManager.h" />
     <ClInclude Include="src\Timer.h" />
   </ItemGroup>
   <ItemGroup>

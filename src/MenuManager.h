@@ -1,5 +1,6 @@
 #pragma once
 #include <windows.h>
+#include "Constants.h"
 
 
 /// <summary>
@@ -7,17 +8,31 @@
 /// </summary>
 enum MenuItemID
 {
+	/// <summary>
+	/// ゲームスタート
+	/// </summary>
 	MENU_START,
+
+	/// <summary>
+	/// ハイスコア画面
+	/// </summary>
 	MENU_HIGHSCORE,
+
+	/// <summary>
+	/// ゲーム終了
+	/// </summary>
 	MENU_QUIT,
 
+	/// <summary>
+	/// メニューアイテムの数
+	/// </summary>
 	MENU_ITEM_ID_NUM
 };
 
 
-static const char** MENU_ITEM_TEXTS;
-
-
+/// <summary>
+/// メニューアイテム
+/// </summary>
 class MenuItem
 {
 private:
@@ -34,7 +49,10 @@ public:
 };
 
 
-class Menu
+/// <summary>
+/// メニューアイテムを管理するクラス
+/// </summary>
+class MenuManager
 {
 private:
 	int menuItemsLength;
@@ -43,8 +61,8 @@ private:
 	void setCurrentSelectItems();
 
 public:
-	Menu();
-	~Menu();
+	MenuManager();
+	~MenuManager();
 	void nextItem();
 	void previousItem();
 	MenuItemID getCurrentID();

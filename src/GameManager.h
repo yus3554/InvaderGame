@@ -1,18 +1,19 @@
 #pragma once
 #include <windows.h>
-#include "Menu.h"
+#include <stdio.h>
+#include "MenuManager.h"
 #include "Timer.h"
 #include "DrawManager.h"
 #include "KeyStateManager.h"
-
+#include "Constants.h"
 
 class GameManager
 {
 private:
 	/// <summary>
-	/// メニュー
+	/// メニューマネージャー
 	/// </summary>
-	Menu* menu;
+	MenuManager* mm;
 
 	/// <summary>
 	/// タイマー
@@ -107,10 +108,10 @@ public:
 	void setPlayerPos(POINT pos);
 
 	/// <summary>
-	/// メニューの取得
+	/// メニューマネージャーの取得
 	/// </summary>
 	/// <returns> メニュー </returns>
-	Menu* getMenu();
+	MenuManager* getMenuManager();
 
 	/// <summary>
 	/// キー押下時の処理

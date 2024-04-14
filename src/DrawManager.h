@@ -1,9 +1,13 @@
 #pragma once
 #include <windows.h>
 #include "Constants.h"
-#include "Menu.h"
+#include "MenuManager.h"
 #include "Timer.h"
+#include "resource.h"
 
+/// <summary>
+/// 描画を管理するクラス
+/// </summary>
 class DrawManager
 {
 private:
@@ -69,8 +73,8 @@ private:
 	/// </summary>
 	/// <param name="hdc">デバイスコンテキスト</param>
 	/// <param name="rect">ウィンドウサイズ</param>
-	/// <param name="menu">メニュー</param>
-	void drawMenu(HDC hdc, RECT* rect, Menu* menu);
+	/// <param name="menu">メニューマネージャー</param>
+	void drawMenu(HDC hdc, RECT* rect, MenuManager* mm);
 
 	/// <summary>
 	/// プレイヤーの表示
@@ -126,9 +130,9 @@ public:
 	/// 描画
 	/// </summary>
 	/// <param name="state"></param>
-	/// <param name="menu"></param>
+	/// <param name="mm"></param>
 	/// <param name="playerPos"></param>
 	/// <param name="timer"></param>
-	void paint(GameState state, Menu* menu, POINT playerPos, Timer* timer);
+	void paint(GameState state, MenuManager* mm, POINT playerPos, Timer* timer);
 };
 
