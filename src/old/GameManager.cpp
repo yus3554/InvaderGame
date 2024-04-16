@@ -4,8 +4,6 @@ GameManager::GameManager(HWND hwnd, HINSTANCE hInstance)
 {
 	// 描画を担当するクラス
 	this->dm = new DrawManager(hwnd, hInstance);
-	// タイマー
-	this->timer = new Timer(FPS);
 	// メニュー
 	this->mm = new MenuManager();
 	// キー入力管理クラス
@@ -20,7 +18,6 @@ GameManager::GameManager(HWND hwnd, HINSTANCE hInstance)
 GameManager::~GameManager() {
 	delete this->mm;
 	delete this->dm;
-	delete this->timer;
 	delete this->km;
 }
 
@@ -34,22 +31,13 @@ void GameManager::GameInit()
 
 void GameManager::GameUpdate()
 {
-	// タイマーアップデート
-	int loop = timer->getDiffFrame();
-
-	// メイン処理
-	for (int i = 0; i < loop; i++)
-	{
-		// キー入力アップデート
-		this->km->update();
-		// キー入力による処理
-		this->keyPress();
-		// 描画
-		this->dm->paint(this->getCurrentGameState(), this->getMenuManager(), this->getPlayerPos(), this->timer);
-	}
-
-	// TODO: やっぱ待たないとCPU使用率がやばい
-	Sleep(1);
+	// キー入力アップデート
+	this->km->update();
+	// キー入力による処理
+	this->keyPress();
+	// 描画
+	// this->dm->paint(this->getCurrentGameState(), this->getMenuManager(), this->getPlayerPos(), this->timer);
+	
 }
 
 void GameManager::GameQuit()

@@ -1,9 +1,9 @@
 #pragma once
 #include <windows.h>
-#include "Constants.h"
-#include "MenuManager.h"
-#include "Timer.h"
-#include "resource.h"
+#include "../Constants.h"
+#include "../MenuManager.h"
+#include "../Timer.h"
+#include "../resource.h"
 
 /// <summary>
 /// •`‰æ‚ğŠÇ—‚·‚éƒNƒ‰ƒX

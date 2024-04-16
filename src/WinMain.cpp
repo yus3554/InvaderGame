@@ -1,9 +1,8 @@
 #include <windows.h>
 #include <stdio.h>
 #include "Constants.h"
-#include "DrawManager.h"
-#include "GameManager.h"
 #include "Timer.h"
+#include "./gameObjects/Title.h"
 
 /// <summary>
 /// ウィンドウプロシージャ
@@ -57,7 +56,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 	winc.hInstance = hInstance;
 	winc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
 	winc.hCursor = LoadCursor(NULL, IDC_ARROW);
-	winc.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
+	winc.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
 	winc.lpszMenuName = NULL;
 	winc.lpszClassName = WND_CLASS_NAME;
 	// ウィンドウクラス登録
@@ -71,10 +70,18 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 	);
 	if (hwnd == NULL) return 0;
 
-	// ゲームを管理するクラス
-	GameManager* gm = new GameManager(hwnd, hInstance);
-	// ゲーム初期化
-	gm->GameInit();
+
+	// キーステート
+	KeyStateManager* km = new KeyStateManager();
+	// タイマー
+	Timer* timer = new Timer(FPS);
+	// ステート管理
+	GameState state = STATE_TITLE;
+	// 画面
+	Title* title = new Title(&state, km);
+	// レンダラー
+	Renderer renderer = Renderer(hwnd, hInstance, IDB_BITMAP1);
+	
 
 	// メッセージループ（WM_QUIT時のみループを抜ける）
 	while (true)
@@ -88,19 +95,38 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 		}
 		else {
 			// エスケープキー押下 or StateがQuit の場合に終了
-			if (KEYDOWN(VK_ESCAPE) || gm->getCurrentGameState() == STATE_QUIT)
+			if (KEYDOWN(VK_ESCAPE) || state == STATE_QUIT)
 			{
 				SendMessage(hwnd, WM_CLOSE, 0, 0);
 			}
 
-			// ゲームの処理
-			gm->GameUpdate();
+			// タイマーアップデート
+			int loop = timer->getDiffFrame();
+
+			// メイン処理
+			for (int i = 0; i < loop; i++)
+			{
+				// キー入力アップデート
+				km->update();
+
+				// アップデート
+				title->Update();
+
+				// レンダラーに描画依頼
+				title->Draw(renderer);
+
+
+				// レンダリング
+				renderer.Render();
+			}
+
+			// TODO: やっぱ待たないとCPU使用率がやばい
+			Sleep(1);
 		}
 	}
 
-	// ゲーム終了処理
-	gm->GameQuit();
-	delete gm;
+	// 終了処理
+	delete timer;
 
 	return (int)msg.wParam;
 }

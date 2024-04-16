@@ -1,11 +1,11 @@
 #pragma once
 #include <windows.h>
 #include <stdio.h>
-#include "MenuManager.h"
-#include "Timer.h"
+#include "../MenuManager.h"
+#include "../Timer.h"
 #include "DrawManager.h"
-#include "KeyStateManager.h"
-#include "Constants.h"
+#include "../KeyStateManager.h"
+#include "../Constants.h"
 
 class GameManager
 {
@@ -14,11 +14,6 @@ private:
 	/// メニューマネージャー
 	/// </summary>
 	MenuManager* mm;
-
-	/// <summary>
-	/// タイマー
-	/// </summary>
-	Timer* timer;
 
 	/// <summary>
 	/// 描画マネージャー
