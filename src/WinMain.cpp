@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include "Constants.h"
 #include "Timer.h"
-#include "./gameObjects/Title.h"
+#include "./gameScene/GameScenes.h"
 
 /// <summary>
 /// ウィンドウプロシージャ
@@ -33,6 +33,14 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	}
 
 	return DefWindowProc(hwnd, msg, wParam, lParam);
+}
+
+//スレッド関数
+DWORD WINAPI ThreadFunc(LPVOID renderer)
+{
+	// レンダリング
+	((Renderer*)renderer)->Render();
+	return 0;
 }
 
 /// <summary>
@@ -72,15 +80,22 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 
 
 	// キーステート
-	KeyStateManager* km = new KeyStateManager();
+	KeyStateManager keyStateManager = KeyStateManager();
 	// タイマー
-	Timer* timer = new Timer(FPS);
+	Timer timer = Timer(FPS);
 	// ステート管理
 	GameState state = STATE_TITLE;
 	// 画面
-	Title* title = new Title(&state, km);
+	Title title = Title(&state, &keyStateManager);
+	Game game = Game(&state, &keyStateManager);
+	Result result = Result(&state, &keyStateManager);
+	HighScore highScore = HighScore(&state, &keyStateManager);
 	// レンダラー
 	Renderer renderer = Renderer(hwnd, hInstance, IDB_BITMAP1);
+
+	// スレッド
+	HANDLE hThread;
+	DWORD dwThreadId;
 	
 
 	// メッセージループ（WM_QUIT時のみループを抜ける）
@@ -101,23 +116,51 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 			}
 
 			// タイマーアップデート
-			int loop = timer->getDiffFrame();
+			int loop = timer.getDiffFrame();
 
 			// メイン処理
 			for (int i = 0; i < loop; i++)
 			{
+				//スレッド起動
+				hThread = CreateThread(
+					NULL, //セキュリティ属性
+					0, //スタックサイズ
+					ThreadFunc, //スレッド関数
+					(LPVOID)&renderer, //スレッド関数に渡す引数
+					0, //作成オプション(0またはCREATE_SUSPENDED)
+					&dwThreadId);//スレッドID
+
 				// キー入力アップデート
-				km->update();
+				keyStateManager.update();
 
-				// アップデート
-				title->Update();
+				// アップデート / 画面描画リクエスト
+				if (state == STATE_TITLE)
+				{
+					title.Update();
+					title.DrawRequest(renderer);
+				}
+				else if (state == STATE_GAME)
+				{
+					game.Update();
+					game.DrawRequest(renderer);
+				}
+				else if (state == STATE_RESULT)
+				{
+					result.Update();
+					result.DrawRequest(renderer);
+				}
+				else if (state == STATE_HIGHSCORE)
+				{
+					highScore.Update();
+					highScore.DrawRequest(renderer);
+				}
 
-				// レンダラーに描画依頼
-				title->Draw(renderer);
+				// レンダラーを待つ
+				if (hThread != NULL)
+					WaitForSingleObject(hThread, INFINITE);
 
+				// レンダラーのinfoをコピーする
 
-				// レンダリング
-				renderer.Render();
 			}
 
 			// TODO: やっぱ待たないとCPU使用率がやばい
@@ -126,7 +169,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 	}
 
 	// 終了処理
-	delete timer;
+
 
 	return (int)msg.wParam;
 }

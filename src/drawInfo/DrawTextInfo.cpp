@@ -1,10 +1,9 @@
 #include "DrawTextInfo.h"
 
-DrawTextInfo::DrawTextInfo(const char* text, double x, double y, int fontSize, COLORREF fontColor, int weight)
+DrawTextInfo::DrawTextInfo(const char* text, POINT pos, int fontSize, COLORREF fontColor, int weight)
 {
 	this->text = TEXT(text);
-	this->x = x;
-	this->y = y;
+	this->pos = pos;
 	this->fontSize = fontSize;
 	this->fontColor = fontColor;
 	this->weight = weight;
@@ -32,7 +31,7 @@ void DrawTextInfo::render(HDC hdc)
 		DEFAULT_PITCH | FF_DONTCARE, //ピッチとファミリ
 		L"メイリオ");			//フォント名
 	hgdi = SelectObject(hdc, font);
-	TextOut(hdc, this->x, this->y, this->text, lstrlen(this->text));
+	TextOut(hdc, this->pos.x, this->pos.y, this->text, lstrlen(this->text));
 	SelectObject(hdc, hgdi);
 	DeleteObject(font);
 

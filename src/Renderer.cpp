@@ -4,7 +4,7 @@ Renderer::Renderer(HWND hwnd, HINSTANCE hInstance, int backgroundBitmapID)
 {
 	this->backgroundBitmapID = backgroundBitmapID;
 	// infoListの初期化
-	this->infoList = new DrawInfoLinkedList();
+	this->linkedList = new LinkedList<DrawInfo>();
 
 	this->hwnd = hwnd;
 	this->hInstance = hInstance;
@@ -20,7 +20,7 @@ Renderer::Renderer(HWND hwnd, HINSTANCE hInstance, int backgroundBitmapID)
 Renderer::~Renderer()
 {
 	// infoListの削除
-	delete this->infoList;
+	delete this->linkedList;
 
 	// ダブルバッファの削除
 	SelectObject(this->backHDC, this->oldBMP);
@@ -39,9 +39,9 @@ void Renderer::Render()
 	this->oldBMP = (HBITMAP)SelectObject(this->backHDC, this->backBMP);
 
 	// drawinfoを描画
-	for (int i = 0; i < this->infoList->getLength(); i++)
+	for (int i = 0; i < this->linkedList->getLength(); i++)
 	{
-		DrawInfo* info = this->infoList->pop();
+		DrawInfo* info = this->linkedList->pop();
 		info->render(this->backHDC);
 		delete info;
 	}
@@ -50,25 +50,27 @@ void Renderer::Render()
 	BitBlt(this->frontHDC, 0, 0, WND_SIZE.x, WND_SIZE.y, this->backHDC, 0, 0, SRCCOPY);
 }
 
-void Renderer::RequestDrawText(const char* text, double x, double y, int fontSize, COLORREF fontColor, int weight)
-{
-	DrawTextInfo* info = new DrawTextInfo(text, x, y, fontSize, fontColor, weight);
-	this->infoList->add(info);
-}
-
 void Renderer::SetBackground(int backgroundBitmapID)
 {
 	this->backgroundBitmapID = backgroundBitmapID;
 }
 
-void Renderer::RequestDrawLine()
+void Renderer::DrawRequestText(const char* text, POINT pos, int fontSize, COLORREF fontColor, int weight)
 {
-	// auto info = new DrawLineInfo();
-	// this->infoList->add(info);
+	DrawTextInfo* info = new DrawTextInfo(text, pos, fontSize, fontColor, weight);
+	this->linkedList->add(info);
 }
 
-void Renderer::RequestDrawRect()
+
+void Renderer::DrawRequestLine()
 {
-	// auto info = new DrawRectInfo();
-	// this->infoList->add(info);
+	// auto info = new DrawLineInfo();
+	// this->linkedList->add(info);
+}
+
+void Renderer::DrawRequestRect(
+	POINT pos, int width, int height, COLORREF backgroundColor, COLORREF borderColor, int borderWidth)
+{
+	auto info = new DrawRectInfo(pos, width, height, backgroundColor, borderColor, borderWidth);
+	this->linkedList->add(info);
 }

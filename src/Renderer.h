@@ -1,14 +1,15 @@
 #pragma once
 #include <windows.h>
-#include "DrawInfoLinkedList.h"
+#include "LinkedList.h"
 #include "resource.h"
 #include "Constants.h"
-#include "drawInfos/DrawTextInfo.h"
+#include "drawInfo/DrawInfos.h"
 
 class Renderer
 {
 private:
-	DrawInfoLinkedList* infoList;
+	LinkedList<DrawInfo>* linkedList;
+	// LinkedList<DrawInfo>* renderLinkedList;
 
 	/// <summary>
 	/// ウィンドウ
@@ -46,8 +47,9 @@ public:
 	~Renderer();
 	void SetBackground(int BITMAP_ID);
 	void Render();
-	void RequestDrawText(const char* text, double x, double y, int fontSize, COLORREF fontColor, int weight);
-	void RequestDrawLine();
-	void RequestDrawRect();
+	// void CopyInfos();
+	void DrawRequestText(const char* text, POINT pos, int fontSize, COLORREF fontColor, int weight);
+	void DrawRequestLine();
+	void DrawRequestRect(POINT pos, int width, int height, COLORREF backgroundColor, COLORREF borderColor, int borderWidth);
 };
 

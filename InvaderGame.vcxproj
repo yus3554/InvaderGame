@@ -127,11 +127,25 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\drawInfos\DrawTextInfo.cpp" />
-    <ClCompile Include="src\drawInfos\DrawInfo.cpp" />
-    <ClCompile Include="src\DrawInfoLinkedList.cpp" />
+    <ClCompile Include="src\gameActor\actors\player\NormalPlayer.cpp" />
+    <ClCompile Include="src\gameActor\actors\shot\NormalShot.cpp" />
+    <ClCompile Include="src\gameActor\actors\enemy\NormalEnemy.cpp" />
+    <ClCompile Include="src\gameActor\manager\EnemyManager.cpp" />
+    <ClCompile Include="src\gameActor\manager\ShotManager.cpp" />
+    <ClCompile Include="src\gameActor\manager\ActorManager.cpp" />
+    <ClCompile Include="src\gameActor\actors\player\PlayerBase.cpp" />
+    <ClCompile Include="src\gameActor\actors\enemy\EnemyBase.cpp" />
+    <ClCompile Include="src\gameActor\actors\shot\ShotBase.cpp" />
+    <ClCompile Include="src\gameActor\GameActor.cpp" />
+    <ClCompile Include="src\drawInfo\DrawRectInfo.cpp" />
+    <ClCompile Include="src\gameScene\scenes\Game.cpp" />
+    <ClCompile Include="src\gameScene\scenes\HighScore.cpp" />
+    <ClCompile Include="src\gameScene\scenes\Result.cpp" />
+    <ClCompile Include="src\drawInfo\DrawTextInfo.cpp" />
+    <ClCompile Include="src\drawInfo\DrawInfo.cpp" />
+    <ClCompile Include="src\LinkedList.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
-    <ClCompile Include="src\gameObjects\GameScene.cpp" />
+    <ClCompile Include="src\gameScene\GameScene.cpp" />
     <ClCompile Include="src\KeyStateManager.cpp" />
     <ClCompile Include="src\old\DrawManager.cpp" />
     <ClCompile Include="src\old\GameManager.cpp" />
@@ -139,22 +153,41 @@
     <ClCompile Include="src\Constants.h" />
     <ClCompile Include="src\WinMain.cpp" />
     <ClCompile Include="src\Timer.cpp" />
-    <ClCompile Include="src\gameObjects\Title.cpp" />
+    <ClCompile Include="src\gameScene\scenes\Title.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\drawInfos\DrawTextInfo.h" />
-    <ClInclude Include="src\drawInfos\DrawInfo.h" />
-    <ClInclude Include="src\DrawInfoLinkedList.h" />
+    <ClInclude Include="src\gameActor\actors\enemy\Enemys.h" />
+    <ClInclude Include="src\gameActor\actors\player\NormalPlayer.h" />
+    <ClInclude Include="src\gameActor\actors\player\Players.h" />
+    <ClInclude Include="src\gameActor\actors\shot\NormalShot.h" />
+    <ClInclude Include="src\gameActor\actors\enemy\NormalEnemy.h" />
+    <ClInclude Include="src\gameActor\actors\shot\Shots.h" />
+    <ClInclude Include="src\gameActor\manager\EnemyManager.h" />
+    <ClInclude Include="src\gameActor\manager\ShotManager.h" />
+    <ClInclude Include="src\gameActor\manager\ActorManager.h" />
+    <ClInclude Include="src\gameActor\actors\player\PlayerBase.h" />
+    <ClInclude Include="src\gameActor\actors\enemy\EnemyBase.h" />
+    <ClInclude Include="src\gameActor\actors\shot\ShotBase.h" />
+    <ClInclude Include="src\gameActor\GameActor.h" />
+    <ClInclude Include="src\drawInfo\DrawInfos.h" />
+    <ClInclude Include="src\drawInfo\DrawRectInfo.h" />
+    <ClInclude Include="src\gameScene\scenes\Game.h" />
+    <ClInclude Include="src\gameScene\scenes\HighScore.h" />
+    <ClInclude Include="src\gameScene\GameScenes.h" />
+    <ClInclude Include="src\gameScene\scenes\Result.h" />
+    <ClInclude Include="src\drawInfo\DrawTextInfo.h" />
+    <ClInclude Include="src\drawInfo\DrawInfo.h" />
+    <ClInclude Include="src\LinkedList.h" />
     <ClInclude Include="src\Renderer.h" />
-    <ClInclude Include="src\gameObjects\GameObject.h" />
-    <ClInclude Include="src\gameObjects\GameScene.h" />
+    <ClInclude Include="src\gameScene\GameObject.h" />
+    <ClInclude Include="src\gameScene\GameScene.h" />
     <ClInclude Include="src\resource.h" />
     <ClInclude Include="src\KeyStateManager.h" />
     <ClInclude Include="src\old\DrawManager.h" />
     <ClInclude Include="src\old\GameManager.h" />
     <ClInclude Include="src\MenuManager.h" />
     <ClInclude Include="src\Timer.h" />
-    <ClInclude Include="src\gameObjects\Title.h" />
+    <ClInclude Include="src\gameScene\scenes\Title.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="src\Resource.rc" />

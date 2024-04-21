@@ -3,9 +3,9 @@
 class DrawInfo
 {
 protected:
-	double x;
-	double y;
+	POINT pos;
 public:
+	DrawInfo();
 	virtual void render(HDC hdc) = 0;
 };
 

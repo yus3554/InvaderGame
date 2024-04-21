@@ -64,7 +64,7 @@ constexpr POINT PLAYER_INIT_POS = {WND_SIZE.x / 2, WND_SIZE.y - 100};
 /// <summary>
 /// 描画フレーム
 /// </summary>
-constexpr int FPS = 60;
+constexpr int FPS = 10;
 
 /// <summary>
 /// 対応キーコードの数
