@@ -18,8 +18,7 @@ template <typename T>
 class LinkedList
 {
 private:
-	Node<T>* first;
-	Node<T>* last;
+	Node<T>* head;
 	int length;
 public:
 	LinkedList();
@@ -36,8 +35,7 @@ public:
 template <typename T>
 LinkedList<T>::LinkedList()
 {
-	this->first = NULL;
-	this->last = NULL;
+	this->head = NULL;
 	this->length = 0;
 }
 
@@ -56,22 +54,21 @@ int LinkedList<T>::getLength()
 template <typename T>
 void LinkedList<T>::add(T* info)
 {
+	Node<T>* next = new Node<T>(info);
+
 	// ––”ö‚É’Ç‰Á
 	if (this->getLength() == 0)
 	{
-		this->first = new Node<T>(info);
-	}
-	else if (this->getLength() == 1)
-	{
-		Node<T>* next = new Node<T>(info);
-		this->first->setNext(next);
-		this->last = next;
+		this->head = next;
 	}
 	else
 	{
-		Node<T>* next = new Node<T>(info);
-		this->last->setNext(next);
-		this->last = next;
+		Node<T>* temp = this->head;
+		while (temp->getNext() != NULL)
+		{
+			temp = temp->getNext();
+		}
+		temp->setNext(next);
 	}
 	this->length++;
 }
@@ -85,27 +82,21 @@ T* LinkedList<T>::pop()
 		return NULL;
 	}
 
-	T* info = this->first->getValue();
+	T* value = this->head->getValue();
 
 	if (this->getLength() == 1)
 	{
-		delete this->first;
-		this->first = NULL;
-	}
-	else if (this->getLength() == 2)
-	{
-		delete this->first;
-		this->first = this->last;
-		this->last = NULL;
+		delete this->head;
+		this->head = NULL;
 	}
 	else
 	{
-		Node<T>* tempFirst = this->first;
-		this->first = this->first->getNext();
-		delete tempFirst;
+		Node<T>* tempHead = this->head;
+		this->head = this->head->getNext();
+		delete tempHead;
 	}
 	this->length--;
-	return info;
+	return value;
 }
 
 template <typename T>
@@ -114,7 +105,7 @@ T* LinkedList<T>::get(int index)
 	if (index >= this->getLength())
 		throw "out of range for index.";
 
-	Node<T>* temp = this->first;
+	Node<T>* temp = this->head;
 	for (int i = 1; i <= index; i++)
 	{
 		temp = temp->getNext();
@@ -128,23 +119,32 @@ void LinkedList<T>::remove(int index)
 	if (index >= this->getLength())
 		throw "out of range for index.";
 
-	Node<T>* temp;
+	Node<T>* tempCurrent = this->head;
+	Node<T>* tempNext = this->head->getNext();
 	if (index == 0)
 	{
-		temp = this->first;
-		delete temp;
-		this->first = NULL;
+		delete tempCurrent;
+		this->head = tempNext;
 	}
 	else
 	{
-		
+		for (int i = 1; i < index; i++)
+		{
+			tempCurrent = tempNext;
+			tempNext = tempCurrent->getNext();
+		}
+		if (tempNext == NULL)
+			throw "tempNext‚ªNULL‚Å‚·B";
+		tempCurrent->setNext(tempNext->getNext());
+		delete tempNext;
 	}
+	this->length--;
 }
 
 template <typename T>
 void LinkedList<T>::clear()
 {
-	
+	while(this->pop() != NULL){}
 }
 
 template <typename T>

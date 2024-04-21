@@ -5,10 +5,9 @@ class ShotBase :
     public GameActor
 {
 protected:
-    int speed;
     bool isPlayerShot;
 public:
-    ShotBase();
+    ShotBase(POINTFLOAT pos, int width, int height, int speed, bool isPlayerShot, Timer* timer);
     virtual void Update() = 0;
 };
 

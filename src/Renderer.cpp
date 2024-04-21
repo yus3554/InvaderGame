@@ -55,9 +55,10 @@ void Renderer::SetBackground(int backgroundBitmapID)
 	this->backgroundBitmapID = backgroundBitmapID;
 }
 
-void Renderer::DrawRequestText(const char* text, POINT pos, int fontSize, COLORREF fontColor, int weight)
+void Renderer::DrawRequestText(const char* text, POINTFLOAT pos, int fontSize, COLORREF fontColor, int weight)
 {
-	DrawTextInfo* info = new DrawTextInfo(text, pos, fontSize, fontColor, weight);
+	POINT posLONG = { pos.x, pos.y };
+	DrawTextInfo* info = new DrawTextInfo(text, posLONG, fontSize, fontColor, weight);
 	this->linkedList->add(info);
 }
 
@@ -69,8 +70,9 @@ void Renderer::DrawRequestLine()
 }
 
 void Renderer::DrawRequestRect(
-	POINT pos, int width, int height, COLORREF backgroundColor, COLORREF borderColor, int borderWidth)
+	POINTFLOAT pos, int width, int height, COLORREF backgroundColor, COLORREF borderColor, int borderWidth)
 {
-	auto info = new DrawRectInfo(pos, width, height, backgroundColor, borderColor, borderWidth);
+	POINT posLONG = { pos.x, pos.y };
+	auto info = new DrawRectInfo(posLONG, width, height, backgroundColor, borderColor, borderWidth);
 	this->linkedList->add(info);
 }

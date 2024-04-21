@@ -48,8 +48,8 @@ public:
 	void SetBackground(int BITMAP_ID);
 	void Render();
 	// void CopyInfos();
-	void DrawRequestText(const char* text, POINT pos, int fontSize, COLORREF fontColor, int weight);
+	void DrawRequestText(const char* text, POINTFLOAT pos, int fontSize, COLORREF fontColor, int weight);
 	void DrawRequestLine();
-	void DrawRequestRect(POINT pos, int width, int height, COLORREF backgroundColor, COLORREF borderColor, int borderWidth);
+	void DrawRequestRect(POINTFLOAT pos, int width, int height, COLORREF backgroundColor, COLORREF borderColor, int borderWidth);
 };
 

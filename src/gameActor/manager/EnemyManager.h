@@ -8,17 +8,17 @@ class EnemyManager :
 private:
     ShotManager* shotManager;
 public:
-    EnemyManager(ShotManager* shotManager);
+    EnemyManager(ShotManager* shotManager, Timer* timer);
     void Update();
 
     template <class T>
-    void CreateEnemy(POINT pos);
+    void CreateEnemy(POINTFLOAT pos, int returnMovementValue);
 };
 
 template <class T>
-void EnemyManager::CreateEnemy(POINT pos)
+void EnemyManager::CreateEnemy(POINTFLOAT pos, int returnMovementValue)
 {
-    auto actor = new T(pos, this->shotManager);
-    this->linkedList->add(actor);
+    auto actor = new T(pos, this->shotManager, ActorManager::timer, returnMovementValue);
+    ActorManager::linkedList->add(actor);
 }
 

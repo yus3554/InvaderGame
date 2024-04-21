@@ -1,23 +1,20 @@
 #include "NormalPlayer.h"
 
-NormalPlayer::NormalPlayer(POINT pos, KeyStateManager* keyStateManager, ShotManager* shotManager)
+NormalPlayer::NormalPlayer(POINTFLOAT pos, KeyStateManager* keyStateManager, ShotManager* shotManager, Timer* timer)
+	: PlayerBase(pos, 20, 20, 10, keyStateManager, shotManager, timer)
 {
-	this->pos = pos;
-	this->speed = 10;
-	this->keyStateManager = keyStateManager;
-	this->shotManager = shotManager;
 }
 
 void NormalPlayer::Update()
 {
 	if (this->keyStateManager->getKeyState(VK_LEFT)->getIsDownCurrent())
 	{
-		this->pos.x -= this->speed;
+		this->pos.x -= this->speed * 60.0 / this->timer->getRealFPS();
 	}
 	
 	if (this->keyStateManager->getKeyState(VK_RIGHT)->getIsDownCurrent())
 	{
-		this->pos.x += this->speed;
+		this->pos.x += this->speed * 60.0 / this->timer->getRealFPS();
 	}
 
 	if (this->keyStateManager->getKeyState(VK_SPACE)->getIsDownStart())

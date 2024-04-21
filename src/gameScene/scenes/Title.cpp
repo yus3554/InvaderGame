@@ -54,11 +54,11 @@ void Title::DrawRequest(Renderer& renderer)
 	MenuItem** items = this->menuManager->getMenuItems();
 
 	// 配置位置のxとy
-	POINT pos = { (LONG)(WND_SIZE.x / 2.0) , (LONG)(WND_SIZE.y / 2.0) };
+	POINTFLOAT pos = { WND_SIZE.x / 2.0 , WND_SIZE.y / 2.0 };
 
 	// タイトル
 	renderer.DrawRequestText(UI_TEXT_TITLE, pos, 50, RGB(255, 255, 255), FW_BOLD);
-	pos.y += 40;
+	pos.y += 40.0;
 
 	for (int i = 0; i < this->menuManager->getMenuItemsLength(); i++)
 	{
@@ -71,6 +71,6 @@ void Title::DrawRequest(Renderer& renderer)
 		renderer.DrawRequestText(
 			items[i]->getMenuItemName(), pos, 30, fontColor, FW_BOLD
 		);
-		pos.y += 30;
+		pos.y += 30.0;
 	}
 }

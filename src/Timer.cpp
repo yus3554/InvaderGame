@@ -22,8 +22,8 @@ int Timer::getDiffFrame()
 	QueryPerformanceCounter(&nowCount);
 
 	// スタートカウントとnowカウントとの差分から、現在のフレーム数を出す
-	beforeFrame = (int)((beforeCount.QuadPart - this->startCount.QuadPart) / (cpuFreq.QuadPart / this->targetFPS));
-	nowFrame = (int)((nowCount.QuadPart - this->startCount.QuadPart) / (cpuFreq.QuadPart / this->targetFPS));
+	beforeFrame = (int)((double)(beforeCount.QuadPart - this->startCount.QuadPart) / ((double)cpuFreq.QuadPart / this->targetFPS));
+	nowFrame = (int)((double)(nowCount.QuadPart - this->startCount.QuadPart) / ((double)cpuFreq.QuadPart / this->targetFPS));
 
 	// 現在のフレームのほうがbeforeフレームより大きくなった場合に、その差分をloopにいれる
 	if (nowFrame > beforeFrame) {

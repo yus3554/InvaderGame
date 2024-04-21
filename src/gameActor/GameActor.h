@@ -1,14 +1,23 @@
 #pragma once
 #include <windows.h>
+#include "../Timer.h"
 
 class GameActor
 {
 protected:
-	POINT pos;
+	POINTFLOAT pos;
+	POINTFLOAT initPos;
+	int width;
+	int height;
 	int speed;
+	Timer* timer;
 public:
-	GameActor();
+	GameActor(POINTFLOAT pos, int width, int height, int speed, Timer* timer);
 	virtual void Update() = 0;
-	POINT getPos();
+	POINTFLOAT getPos();
+	void InitPos();
+	RECT GetRect();
+	int GetWidth();
+	int GetHeight();
 };
 

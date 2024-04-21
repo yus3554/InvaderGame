@@ -1,8 +1,9 @@
 #include "ActorManager.h"
 
-ActorManager::ActorManager()
+ActorManager::ActorManager(Timer* timer)
 {
-	this->linkedList = NULL;
+	this->linkedList = new LinkedList<GameActor>();
+	this->timer = timer;
 }
 
 int ActorManager::getListLength()
@@ -22,8 +23,5 @@ void ActorManager::removeActor(int index)
 
 void ActorManager::clear()
 {
-	for (int i = 0; i < this->linkedList->getLength(); i++)
-	{
-		this->linkedList->remove(i);
-	}
+	this->linkedList->clear();
 }

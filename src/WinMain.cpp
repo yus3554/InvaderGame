@@ -35,13 +35,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	return DefWindowProc(hwnd, msg, wParam, lParam);
 }
 
-//スレッド関数
-DWORD WINAPI ThreadFunc(LPVOID renderer)
-{
-	// レンダリング
-	((Renderer*)renderer)->Render();
-	return 0;
-}
 
 /// <summary>
 /// メイン関数
@@ -83,19 +76,16 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 	KeyStateManager keyStateManager = KeyStateManager();
 	// タイマー
 	Timer timer = Timer(FPS);
+	char fpsStr[100] = "";
 	// ステート管理
 	GameState state = STATE_TITLE;
 	// 画面
 	Title title = Title(&state, &keyStateManager);
-	Game game = Game(&state, &keyStateManager);
+	Game game = Game(&state, &keyStateManager, &timer);
 	Result result = Result(&state, &keyStateManager);
 	HighScore highScore = HighScore(&state, &keyStateManager);
 	// レンダラー
 	Renderer renderer = Renderer(hwnd, hInstance, IDB_BITMAP1);
-
-	// スレッド
-	HANDLE hThread;
-	DWORD dwThreadId;
 	
 
 	// メッセージループ（WM_QUIT時のみループを抜ける）
@@ -121,17 +111,13 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 			// メイン処理
 			for (int i = 0; i < loop; i++)
 			{
-				//スレッド起動
-				hThread = CreateThread(
-					NULL, //セキュリティ属性
-					0, //スタックサイズ
-					ThreadFunc, //スレッド関数
-					(LPVOID)&renderer, //スレッド関数に渡す引数
-					0, //作成オプション(0またはCREATE_SUSPENDED)
-					&dwThreadId);//スレッドID
-
 				// キー入力アップデート
 				keyStateManager.update();
+
+				// FPS表示
+				sprintf_s(fpsStr, sizeof(fpsStr), "%5lf FPS", timer.getRealFPS());
+				POINTFLOAT pos = { 70, 10 };
+				renderer.DrawRequestText(fpsStr, pos, 20, RGB(255, 255, 255), FW_BOLD);
 
 				// アップデート / 画面描画リクエスト
 				if (state == STATE_TITLE)
@@ -155,16 +141,12 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 					highScore.DrawRequest(renderer);
 				}
 
-				// レンダラーを待つ
-				if (hThread != NULL)
-					WaitForSingleObject(hThread, INFINITE);
-
-				// レンダラーのinfoをコピーする
-
+				// レンダリング
+				renderer.Render();
 			}
 
 			// TODO: やっぱ待たないとCPU使用率がやばい
-			Sleep(1);
+			// Sleep(1);
 		}
 	}
 

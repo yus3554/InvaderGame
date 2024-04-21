@@ -4,7 +4,7 @@ class NormalPlayer :
     public PlayerBase
 {
 public:
-    NormalPlayer(POINT pos, KeyStateManager* keyStateManager, ShotManager* shotManager);
+    NormalPlayer(POINTFLOAT pos, KeyStateManager* keyStateManager, ShotManager* shotManager, Timer* timer);
     void Update();
 };
 

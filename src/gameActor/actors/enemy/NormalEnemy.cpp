@@ -1,15 +1,26 @@
 #include "NormalEnemy.h"
 
-NormalEnemy::NormalEnemy(POINT pos, ShotManager* shotManager)
+NormalEnemy::NormalEnemy(POINTFLOAT pos, ShotManager* shotManager, Timer* timer, int returnMovementValue)
+	: EnemyBase(pos, 20, 20, 3, shotManager, timer, returnMovementValue)
 {
-	this->pos = pos;
-	this->shotManager = shotManager;
-	this->speed = 2;
 }
 
 void NormalEnemy::Update()
 {
-	this->pos.x += this->speed;
-	this->pos.y += 2;
-	// this->shotManager->CreateShot<NormalShot>(this->pos, false);
+	if (this->pos.x < this->initPos.x || this->pos.x > this->initPos.x + this->returnMovementValue)
+	{
+		this->pos.y += 20;
+		if ((this->pos.x < this->initPos.x && this->speed < 0) ||
+			(this->pos.x > this->initPos.x + this->returnMovementValue && this->speed > 0)
+			)
+		{
+			this->speed *= -1;
+		}
+	}
+	this->pos.x += this->speed * 60.0 / this->timer->getRealFPS();
+
+	if (this->currentCount % (int)(this->timer->getRealFPS() / 3) == 0)
+		this->shotManager->CreateShot<NormalShot>(this->pos, false);
+
+	this->currentCount++;
 }

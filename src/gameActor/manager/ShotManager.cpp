@@ -1,14 +1,13 @@
 #include "ShotManager.h"
 
-ShotManager::ShotManager()
+ShotManager::ShotManager(Timer* timer) : ActorManager(timer)
 {
-	this->linkedList = new LinkedList<GameActor>();
 }
 
 void ShotManager::Update()
 {
-	for (int i = 0; i < this->linkedList->getLength(); i++)
+	for (int i = 0; i < ActorManager::linkedList->getLength(); i++)
 	{
-		this->linkedList->get(i)->Update();
+		ActorManager::linkedList->get(i)->Update();
 	}
 }

@@ -8,11 +8,10 @@ class PlayerBase :
     public GameActor
 {
 protected:
-    int speed;
     KeyStateManager* keyStateManager;
     ShotManager* shotManager;
 public:
-    PlayerBase();
+    PlayerBase(POINTFLOAT pos, int width, int height, int speed, KeyStateManager* keyStateManager, ShotManager* shotManager, Timer* timer);
     virtual void Update() = 0;
 };
 

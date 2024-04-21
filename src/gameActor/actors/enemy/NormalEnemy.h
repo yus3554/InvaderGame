@@ -5,7 +5,7 @@ class NormalEnemy :
     public EnemyBase
 {
 public:
-    NormalEnemy(POINT pos, ShotManager* shotManager);
+    NormalEnemy(POINTFLOAT pos, ShotManager* shotManager, Timer* timer, int returnMovementValue);
     void Update();
 };
 

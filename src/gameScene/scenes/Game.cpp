@@ -1,21 +1,24 @@
 #include "Game.h"
 #include <stdio.h>
 
-Game::Game(GameState* state, KeyStateManager* keyStateManager)
+Game::Game(GameState* state, KeyStateManager* keyStateManager, Timer* timer)
 {
 	this->isNeedInit = true;
 	this->keyStateManager = keyStateManager;
 	this->state = state;
+	this->timer = timer;
+	this->isGameOver = false;
+	this->isClear = false;
 
 	// ショット管理初期化（必ず一番最初。playerとenemyで使用するため。）
-	this->shotManager = new ShotManager();
+	this->shotManager = new ShotManager(this->timer);
 
 	// プレイヤー初期化
-	POINT playerPos = { (LONG)(WND_SIZE.x / 2), (LONG)WND_SIZE.y - 80 };
-	this->player = new NormalPlayer(playerPos, this->keyStateManager, this->shotManager);
+	POINTFLOAT playerPos = { WND_SIZE.x / 2.0, WND_SIZE.y - 80.0 };
+	this->player = new NormalPlayer(playerPos, this->keyStateManager, this->shotManager, timer);
 
 	// エネミー初期化
-	this->enemyManager = new EnemyManager(this->shotManager);
+	this->enemyManager = new EnemyManager(this->shotManager, this->timer);
 }
 
 Game::~Game()
@@ -27,12 +30,12 @@ Game::~Game()
 
 void Game::Update()
 {
+	// 初期化
 	if (this->isNeedInit)
 	{
 		this->GameInitialize();
 		this->isNeedInit = false;
 	}
-
 	
 	// プレイヤーのupdate
 	this->player->Update();
@@ -40,50 +43,93 @@ void Game::Update()
 	this->enemyManager->Update();
 	this->shotManager->Update();
 	// 当たり判定確認
+	this->HitCheckPlayer();
+	this->HitCheckEnemy();
 
 	// ゲームオーバー or クリア時
-	if (this->keyStateManager->getKeyState(VK_RETURN)->getIsDownStart()) {
+	if (this->isGameOver || this->isClear) {
 		this->GameFinalize();
-		*(this->state) = STATE_RESULT;
 	}
 }
 
 void Game::DrawRequest(Renderer& renderer)
 {
+	if (*(this->state) != STATE_GAME) {
+		return;
+	}
+
 	// 背景画像設定
 	renderer.SetBackground(IDB_BITMAP1);
 
 	// プレイヤー表示
-	POINT playerPos = this->player->getPos();
-	renderer.DrawRequestRect(playerPos, 20, 20, RGB(255, 255, 255), RGB(100, 100, 0), 1);
+	renderer.DrawRequestRect(
+		this->player->getPos(),
+		this->player->GetWidth(), this->player->GetHeight(),
+		RGB(255, 255, 255), RGB(100, 100, 0), 1
+	);
 
 	// エネミー表示
 	for (int i = 0; i < this->enemyManager->getListLength(); i++)
 	{
-		POINT enemyPos = this->enemyManager->getActor(i)->getPos();
-		renderer.DrawRequestRect(enemyPos, 20, 20, RGB(255, 0, 0), RGB(100, 100, 0), 1);
+		renderer.DrawRequestRect(
+			this->enemyManager->getActor(i)->getPos(),
+			this->enemyManager->getActor(i)->GetWidth(), this->enemyManager->getActor(i)->GetHeight(),
+			RGB(255, 0, 0), RGB(100, 100, 0), 1
+		);
 	}
 
 	// ショット表示
 	for (int i = 0; i < this->shotManager->getListLength(); i++)
 	{
-		POINT shotPos = this->shotManager->getActor(i)->getPos();
-		renderer.DrawRequestRect(shotPos, 10, 30, RGB(255, 255, 0), RGB(100, 100, 0), 1);
+		renderer.DrawRequestRect(
+			this->shotManager->getActor(i)->getPos(),
+			this->shotManager->getActor(i)->GetWidth(), this->shotManager->getActor(i)->GetHeight(),
+			RGB(255, 255, 0), RGB(100, 100, 0), 1
+		);
 	}
 }
 
 void Game::GameInitialize()
 {
 	// プレイヤーの位置の初期化
-
+	this->player->InitPos();
 
 	// 敵の初期化
-	POINT enemyPos = { (LONG)(WND_SIZE.x / 2), 50 };
-	this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos);
+	POINTFLOAT enemyPos = { 20.0, 50.0 };
+	this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
 	enemyPos.x += 50;
-	this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos);
+	this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
+	enemyPos.x += 50;
+	this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
+	enemyPos.x += 50;
+	this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
+	enemyPos.x += 50;
+	this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
+	enemyPos.x += 50;
+	this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
+	enemyPos.x += 50;
+	this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
+	enemyPos.x += 50;
+	this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
+	enemyPos.x += 50;
+	this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
 	enemyPos.y += 40;
-	this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos);
+	enemyPos.x = 20.0;
+	this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
+	enemyPos.x += 50;
+	this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
+	enemyPos.x += 50;
+	this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
+	enemyPos.x += 50;
+	this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
+	enemyPos.x += 50;
+	this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
+	enemyPos.x += 50;
+	this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
+	enemyPos.x += 50;
+	this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
+	enemyPos.x += 50;
+	this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
 }
 
 void Game::GameFinalize()
@@ -94,5 +140,35 @@ void Game::GameFinalize()
 	// 弾の削除
 	this->shotManager->clear();
 
+	// 初期化フラグを初期化
 	this->isNeedInit = true;
+
+	// isGameOverとisClearを初期化
+	this->isClear = false;
+	this->isGameOver = false;
+
+	// ステートを変更
+	*(this->state) = STATE_RESULT;
+}
+
+void Game::HitCheckPlayer()
+{
+	RECT playerRect = this->player->GetRect();
+	RECT shotRect;
+	RECT intersectRect;
+	for (int i = 0; i < this->shotManager->getListLength(); i++)
+	{
+		shotRect = this->shotManager->getActor(i)->GetRect();
+		bool isHit = IntersectRect(&intersectRect, &playerRect, &shotRect);
+		if (isHit)
+		{
+			this->isGameOver = true;
+			return;
+		}
+	}
+}
+
+void Game::HitCheckEnemy()
+{
+
 }

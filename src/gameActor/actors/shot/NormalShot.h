@@ -4,7 +4,7 @@ class NormalShot :
     public ShotBase
 {
 public:
-    NormalShot(POINT pos, bool isPlayerShot);
+    NormalShot(POINTFLOAT pos, bool isPlayerShot, Timer* timer);
     void Update();
 };
 

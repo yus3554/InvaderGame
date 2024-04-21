@@ -6,15 +6,15 @@ class ShotManager :
     public ActorManager
 {
 public:
-    ShotManager();
+    ShotManager(Timer* timer);
     void Update();
     template <class T>
-    void CreateShot(POINT pos, bool isPlayerShot);
+    void CreateShot(POINTFLOAT pos, bool isPlayerShot);
 };
 
 template <class T>
-void ShotManager::CreateShot(POINT pos, bool isPlayerShot)
+void ShotManager::CreateShot(POINTFLOAT pos, bool isPlayerShot)
 {
-    auto actor = new T(pos, isPlayerShot);
-    this->linkedList->add(actor);
+    auto actor = new T(pos, isPlayerShot, ActorManager::timer);
+    ActorManager::linkedList->add(actor);
 }
