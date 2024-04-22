@@ -6,6 +6,11 @@ ActorManager::ActorManager(Timer* timer)
 	this->timer = timer;
 }
 
+ActorManager::~ActorManager()
+{
+	delete this->linkedList;
+}
+
 int ActorManager::getListLength()
 {
 	return this->linkedList->getLength();

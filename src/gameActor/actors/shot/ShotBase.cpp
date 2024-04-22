@@ -5,3 +5,8 @@ ShotBase::ShotBase(POINTFLOAT pos, int width, int height, int speed, bool isPlay
 {
 	this->isPlayerShot = isPlayerShot;
 }
+
+bool ShotBase::GetIsPlayerShot()
+{
+	return this->isPlayerShot;
+}

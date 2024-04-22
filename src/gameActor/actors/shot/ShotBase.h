@@ -9,5 +9,6 @@ protected:
 public:
     ShotBase(POINTFLOAT pos, int width, int height, int speed, bool isPlayerShot, Timer* timer);
     virtual void Update() = 0;
+    bool GetIsPlayerShot();
 };
 

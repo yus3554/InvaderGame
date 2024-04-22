@@ -15,7 +15,7 @@ Game::Game(GameState* state, KeyStateManager* keyStateManager, Timer* timer)
 
 	// プレイヤー初期化
 	POINTFLOAT playerPos = { WND_SIZE.x / 2.0, WND_SIZE.y - 80.0 };
-	this->player = new NormalPlayer(playerPos, this->keyStateManager, this->shotManager, timer);
+	this->player = new NormalPlayer(playerPos, this->keyStateManager, this->shotManager, this->timer);
 
 	// エネミー初期化
 	this->enemyManager = new EnemyManager(this->shotManager, this->timer);
@@ -158,7 +158,11 @@ void Game::HitCheckPlayer()
 	RECT intersectRect;
 	for (int i = 0; i < this->shotManager->getListLength(); i++)
 	{
-		shotRect = this->shotManager->getActor(i)->GetRect();
+		ShotBase* shot = dynamic_cast<ShotBase*>(this->shotManager->getActor(i));
+		if (shot == nullptr || shot->GetIsPlayerShot())
+			continue;
+
+		shotRect = shot->GetRect();
 		bool isHit = IntersectRect(&intersectRect, &playerRect, &shotRect);
 		if (isHit)
 		{
@@ -170,5 +174,29 @@ void Game::HitCheckPlayer()
 
 void Game::HitCheckEnemy()
 {
+	RECT shotRect;
+	RECT enemyRect;
+	RECT intersectRect;
+	for (int i = 0; i < this->shotManager->getListLength(); i++)
+	{
+		ShotBase* shot = dynamic_cast<ShotBase*>(this->shotManager->getActor(i));
+		if (shot == nullptr || !shot->GetIsPlayerShot())
+			continue;
 
+		shotRect = shot->GetRect();
+
+		for (int j = 0; j < this->enemyManager->getListLength(); j++)
+		{
+			enemyRect = this->enemyManager->getActor(j)->GetRect();
+			bool isHit = IntersectRect(&intersectRect, &enemyRect, &shotRect);
+			if (isHit)
+			{
+				this->enemyManager->removeActor(j);
+				this->shotManager->removeActor(i);
+				i--;
+				j--;
+				break;
+			}
+		}
+	}
 }

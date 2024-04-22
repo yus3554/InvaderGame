@@ -11,6 +11,7 @@ protected:
 	Timer* timer;
 public:
 	ActorManager(Timer* timer);
+	~ActorManager();
 	virtual void Update() = 0;
 	int getListLength();
 	GameActor* getActor(int index);
