@@ -2,16 +2,15 @@
 #include "DrawInfo.h"
 #include <windows.h>
 #include "../Constants.h"
+#include "../ResourceManager.h"
 
 class DrawImageInfo :
     public DrawInfo
 {
 private:
-    int width;
-    int height;
-    BYTE* pixelBits;
+    ResourceData* resourceData;
     LPDWORD backPixelBits;
 public:
-    DrawImageInfo(POINT pos, int width, int height, BYTE* pixelBits, LPDWORD backPixelBits);
+    DrawImageInfo(POINT pos, ResourceData* resourceData, LPDWORD backPixelBits);
     void render(HDC hdc);
 };

@@ -1,7 +1,7 @@
 #include "HyperPlayer.h"
 
 HyperPlayer::HyperPlayer(POINTFLOAT pos, KeyStateManager* keyStateManager, ShotManager* shotManager, Timer* timer)
-	: PlayerBase(pos, 20, 20, 10, keyStateManager, shotManager, timer)
+	: PlayerBase(pos, 32, 32, 10, keyStateManager, shotManager, timer)
 {
 }
 

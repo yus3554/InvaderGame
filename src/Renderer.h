@@ -1,9 +1,9 @@
 #pragma once
 #include <windows.h>
 #include "LinkedList.h"
-#include "resource.h"
 #include "Constants.h"
 #include "drawInfo/DrawInfos.h"
+#include "ResourceManager.h"
 
 class Renderer
 {
@@ -12,6 +12,8 @@ private:
 	LinkedList<DrawInfo>* tempLinkedList;
 	// レンダリングするリンクドリスト（Render()時に描画）
 	LinkedList<DrawInfo>* renderLinkedList;
+
+	ResourceManager* resourceManager;
 
 	/// <summary>
 	/// ウィンドウ
@@ -53,15 +55,14 @@ private:
 	/// </summary>
 	HINSTANCE hInstance;
 
-	int backgroundBitmapID;
 public:
-	Renderer(HWND hwnd, HINSTANCE hInstance, int backgroundBitmapID);
+	Renderer(HWND hwnd, HINSTANCE hInstance, ResourceManager* resourceManager);
 	~Renderer();
 	void Render();
 	void CopyInfos();
 	void DrawRequestText(const char* text, POINTFLOAT pos, int fontSize, COLORREF fontColor, int weight);
 	void DrawRequestLine();
 	void DrawRequestRect(POINTFLOAT pos, int width, int height, COLORREF backgroundColor, COLORREF borderColor, int borderWidth);
-	void DrawRequestImage(POINTFLOAT pos, int width, int height, BYTE* pixelBits);
+	void DrawRequestImage(POINTFLOAT pos, ResourceData* resourceData);
 };
 

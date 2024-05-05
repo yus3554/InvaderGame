@@ -1,8 +1,8 @@
 #include "Game.h"
-#include <stdio.h>
 
-Game::Game(GameState* state, KeyStateManager* keyStateManager, Timer* timer)
+Game::Game(GameState* state, KeyStateManager* keyStateManager, Timer* timer, ResourceManager* resourceManager)
 {
+	this->resourceManager = resourceManager;
 	this->isNeedInit = true;
 	this->keyStateManager = keyStateManager;
 	this->state = state;
@@ -15,7 +15,7 @@ Game::Game(GameState* state, KeyStateManager* keyStateManager, Timer* timer)
 
 	// プレイヤー初期化
 	POINTFLOAT playerPos = { (FLOAT)(WND_SIZE.x / 2.0), (FLOAT)(WND_SIZE.y - 80.0) };
-	this->player = new HyperPlayer(playerPos, this->keyStateManager, this->shotManager, this->timer);
+	this->player = new NormalPlayer(playerPos, this->keyStateManager, this->shotManager, this->timer);
 
 	// エネミー初期化
 	this->enemyManager = new EnemyManager(this->shotManager, this->timer);
@@ -55,26 +55,24 @@ void Game::Update()
 void Game::DrawRequest(Renderer& renderer)
 {
 	ShotBase* shot;
-	COLORREF shotColor;
+	int shotIndex;
 
 	if (*(this->state) != STATE_GAME) {
 		return;
 	}
 
 	// プレイヤー表示
-	renderer.DrawRequestRect(
+	renderer.DrawRequestImage(
 		this->player->getPos(),
-		this->player->GetWidth(), this->player->GetHeight(),
-		RGB(255, 255, 255), RGB(100, 100, 0), 1
+		this->resourceManager->GetResourceData(RESOURCE_PLAYER, 0)
 	);
 
 	// エネミー表示
 	for (int i = 0; i < this->enemyManager->getListLength(); i++)
 	{
-		renderer.DrawRequestRect(
+		renderer.DrawRequestImage(
 			this->enemyManager->getActor(i)->getPos(),
-			this->enemyManager->getActor(i)->GetWidth(), this->enemyManager->getActor(i)->GetHeight(),
-			RGB(255, 0, 0), RGB(100, 100, 0), 1
+			this->resourceManager->GetResourceData(RESOURCE_ENEMY, 0)
 		);
 	}
 
@@ -86,13 +84,13 @@ void Game::DrawRequest(Renderer& renderer)
 			throw "shotがNULLです。";
 
 		if (shot->GetIsPlayerShot())
-			shotColor = RGB(255, 255, 0);
+			shotIndex = 0;
 		else
-			shotColor = RGB(0, 255, 0);
+			shotIndex = 1;
 
-		renderer.DrawRequestRect(
-			shot->getPos(),	shot->GetWidth(), shot->GetHeight(),
-			shotColor, RGB(100, 100, 0), 1
+		renderer.DrawRequestImage(
+			shot->getPos(),
+			this->resourceManager->GetResourceData(RESOURCE_SHOT, shotIndex)
 		);
 	}
 }

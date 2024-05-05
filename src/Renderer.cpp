@@ -1,14 +1,15 @@
 #include "Renderer.h"
 
-Renderer::Renderer(HWND hwnd, HINSTANCE hInstance, int backgroundBitmapID)
+Renderer::Renderer(HWND hwnd, HINSTANCE hInstance, ResourceManager* resourceManager)
 {
-	this->backgroundBitmapID = backgroundBitmapID;
 	// infoListの初期化
 	this->tempLinkedList = new LinkedList<DrawInfo>();
 	this->renderLinkedList = new LinkedList<DrawInfo>();
 
 	this->hwnd = hwnd;
 	this->hInstance = hInstance;
+
+	this->resourceManager = resourceManager;
 
 	// ダブルバッファ設定
 	this->frontHDC = GetDC(hwnd);
@@ -25,6 +26,14 @@ Renderer::Renderer(HWND hwnd, HINSTANCE hInstance, int backgroundBitmapID)
 	this->backBMP = CreateDIBSection(this->backHDC, &this->backBMPInfo, DIB_RGB_COLORS, (void**)&this->backPixelBits, NULL, 0);
 	if (this->backBMP == NULL)
 		throw "backBMPがNULLです。";
+	this->oldBMP = (HBITMAP)SelectObject(this->backHDC, this->backBMP);
+
+	// 画像読み込み
+	this->resourceManager->Load(RESOURCE_BACKGROUND, 0);
+	this->resourceManager->Load(RESOURCE_PLAYER, 0);
+	this->resourceManager->Load(RESOURCE_ENEMY, 0);
+	this->resourceManager->Load(RESOURCE_SHOT, 0);
+	this->resourceManager->Load(RESOURCE_SHOT, 1);
 }
 
 Renderer::~Renderer()
@@ -45,9 +54,6 @@ Renderer::~Renderer()
 
 void Renderer::Render()
 {
-	// background
-	// this->DrawRequestImage({ 0.0, 0.0 }, WND_SIZE.x, WND_SIZE.y, );
-
 	// drawinfoを描画
 	for (int i = 0; i < this->renderLinkedList->getLength(); i++)
 	{
@@ -94,9 +100,9 @@ void Renderer::DrawRequestRect(
 	this->tempLinkedList->add(info);
 }
 
-void Renderer::DrawRequestImage(POINTFLOAT pos, int width, int height, BYTE* pixelBits)
+void Renderer::DrawRequestImage(POINTFLOAT pos, ResourceData* resourceData)
 {
 	POINT posLONG = { (LONG)pos.x, (LONG)pos.y };
-	auto info = new DrawImageInfo(posLONG, width, height, pixelBits, this->backPixelBits);
+	auto info = new DrawImageInfo(posLONG, resourceData, this->backPixelBits);
 	this->tempLinkedList->add(info);
 }

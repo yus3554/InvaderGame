@@ -121,35 +121,64 @@ enum GameState
 };
 
 /// <summary>
+/// リソース種類
+/// </summary>
+enum ResourceType
+{
+	/// <summary>
+	/// 背景
+	/// </summary>
+	RESOURCE_BACKGROUND,
+
+	/// <summary>
+	/// プレイヤー
+	/// </summary>
+	RESOURCE_PLAYER,
+
+	/// <summary>
+	/// 敵
+	/// </summary>
+	RESOURCE_ENEMY,
+
+	/// <summary>
+	/// ショット
+	/// </summary>
+	RESOURCE_SHOT
+};
+
+
+/// <summary>
 /// 画像のルートパス
 /// </summary>
-constexpr char resourceRootPath[100] = "C:/Users/Yusuke Ota/Development/github/InvaderGame/src/images/";
+constexpr char RESOURCE_ROOT_FOLDERPATH[100] = "C:/Users/Yusuke Ota/Development/github/InvaderGame/src/images/";
 
 /// <summary>
 /// ルートパス以下の背景画像パス
 /// </summary>
-constexpr char backgroundPath[20] = "background.bmp";
+constexpr char BACKGROUND_FILEPATHS[2][20] =
+{
+	"background.bmp",
+	"background2.bmp"
+};
 
 /// <summary>
 /// ルートパス以下のプレイヤー画像パス
 /// </summary>
-constexpr char playerPath[1][20] = {
+constexpr char PLAYER_FILEPATHS[1][20] = {
 	"player1.bmp"
 };
 
 /// <summary>
 /// ルートパス以下の敵画像パス
 /// </summary>
-constexpr char enemyPath[1][20] = {
+constexpr char ENEMY_FILEPATHS[1][20] = {
 	"enemy1.bmp"
 };
 
 /// <summary>
 /// ルートパス以下の弾画像パス
 /// </summary>
-constexpr char shotPath[2][20] = {
+constexpr char SHOT_FILEPATHS[2][20] = {
 	"shot1.bmp",
 	"shot2.bmp"
 };
-
-

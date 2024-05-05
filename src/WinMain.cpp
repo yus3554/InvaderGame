@@ -4,6 +4,8 @@
 #include "Constants.h"
 #include "Timer.h"
 #include "./gameScene/GameScenes.h"
+#include "Renderer.h"
+#include "ResourceManager.h"
 
 /// <summary>
 /// ウィンドウプロシージャ
@@ -86,7 +88,8 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 	);
 	if (hwnd == NULL) return 0;
 
-
+	// リソース
+	ResourceManager resourceManager = ResourceManager();
 	// キーステート
 	KeyStateManager keyStateManager = KeyStateManager();
 	// タイマー
@@ -96,11 +99,11 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 	GameState state = STATE_TITLE;
 	// 画面
 	Title title = Title(&state, &keyStateManager);
-	Game game = Game(&state, &keyStateManager, &timer);
+	Game game = Game(&state, &keyStateManager, &timer, &resourceManager);
 	Result result = Result(&state, &keyStateManager);
 	HighScore highScore = HighScore(&state, &keyStateManager);
 	// レンダラー
-	Renderer renderer = Renderer(hwnd, hInstance, IDB_BITMAP1);
+	Renderer renderer = Renderer(hwnd, hInstance, &resourceManager);
 	// スレッド関連
 	HANDLE hThread;
 	DWORD dwThreadId;
@@ -148,12 +151,17 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 				// キー入力アップデート
 				keyStateManager.update();
 
+				// アップデート / 画面描画リクエスト
+				renderer.DrawRequestImage(
+					{ 0.0, 0.0 },
+					resourceManager.GetResourceData(RESOURCE_BACKGROUND, 0)
+				);
+
 				// FPS表示
 				sprintf_s(fpsStr, sizeof(fpsStr), "%5lf FPS", timer.getRealFPS());
 				POINTFLOAT pos = { 70, 10 };
 				renderer.DrawRequestText(fpsStr, pos, 20, RGB(255, 255, 255), FW_BOLD);
 
-				// アップデート / 画面描画リクエスト
 				if (state == STATE_TITLE)
 				{
 					title.Update();

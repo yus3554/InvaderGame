@@ -1,7 +1,7 @@
 #include "HyperShot.h"
 
 HyperShot::HyperShot(POINTFLOAT pos, bool isPlayerShot, Timer* timer)
-	: ShotBase(pos, 10, 20, 10, isPlayerShot, timer)
+	: ShotBase(pos, 32, 32, 10, isPlayerShot, timer)
 {
 }
 
