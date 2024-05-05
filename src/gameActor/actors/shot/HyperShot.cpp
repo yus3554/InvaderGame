@@ -1,11 +1,11 @@
-#include "NormalShot.h"
+#include "HyperShot.h"
 
-NormalShot::NormalShot(POINTFLOAT pos, bool isPlayerShot, Timer* timer)
-	: ShotBase(pos, 10, 20, 5, isPlayerShot, timer)
+HyperShot::HyperShot(POINTFLOAT pos, bool isPlayerShot, Timer* timer)
+	: ShotBase(pos, 10, 20, 10, isPlayerShot, timer)
 {
 }
 
-void NormalShot::Update()
+void HyperShot::Update()
 {
 	if (this->isPlayerShot)
 	{

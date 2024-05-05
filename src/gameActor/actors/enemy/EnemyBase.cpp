@@ -4,7 +4,7 @@ EnemyBase::EnemyBase(POINTFLOAT pos, int width, int height, int speed, ShotManag
 	: GameActor(pos, width, height, speed, timer)
 {
 	this->shotManager = shotManager;
-	this->currentCount = 0;
+	this->currentCount = 0 + (int)(rand() * (100 - 0 + 1.0) / (1.0 + RAND_MAX));
 	this->returnMovementValue = returnMovementValue;
 }
 

@@ -2,3 +2,4 @@
 
 #include "DrawTextInfo.h"
 #include "DrawRectInfo.h"
+#include "DrawImageInfo.h"

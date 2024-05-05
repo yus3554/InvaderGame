@@ -24,10 +24,10 @@ RECT GameActor::GetRect()
 {
 	// ‚±‚±‚Å‚Ìpos‚Í’†S
 	RECT rect = { 
-		this->pos.x - (this->width / 2),
-		this->pos.y - (this->height / 2),
-		this->pos.x + (this->width / 2),
-		this->pos.y + (this->height / 2),
+		(LONG)(this->pos.x - (this->width / 2)),
+		(LONG)(this->pos.y - (this->height / 2)),
+		(LONG)(this->pos.x + (this->width / 2)),
+		(LONG)(this->pos.y + (this->height / 2)),
 	};
 	return rect;
 }

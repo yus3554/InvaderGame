@@ -2,6 +2,7 @@
 #include "../../GameActor.h"
 #include "../../manager/ShotManager.h"
 #include "../shot/Shots.h"
+#include <stdlib.h>
 
 class EnemyBase :
     public GameActor

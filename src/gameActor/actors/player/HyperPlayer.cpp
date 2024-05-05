@@ -1,11 +1,11 @@
-#include "NormalPlayer.h"
+#include "HyperPlayer.h"
 
-NormalPlayer::NormalPlayer(POINTFLOAT pos, KeyStateManager* keyStateManager, ShotManager* shotManager, Timer* timer)
+HyperPlayer::HyperPlayer(POINTFLOAT pos, KeyStateManager* keyStateManager, ShotManager* shotManager, Timer* timer)
 	: PlayerBase(pos, 20, 20, 10, keyStateManager, shotManager, timer)
 {
 }
 
-void NormalPlayer::Update()
+void HyperPlayer::Update()
 {
 	if (this->keyStateManager->getKeyState(VK_LEFT)->getIsDownCurrent())
 	{
@@ -19,6 +19,6 @@ void NormalPlayer::Update()
 
 	if (this->keyStateManager->getKeyState(VK_SPACE)->getIsDownStart())
 	{
-		this->shotManager->CreateShot<NormalShot>(this->pos, true);
+		this->shotManager->CreateShot<HyperShot>(this->pos, true);
 	}
 }

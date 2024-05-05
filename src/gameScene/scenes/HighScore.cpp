@@ -20,11 +20,8 @@ void HighScore::Update()
 
 void HighScore::DrawRequest(Renderer& renderer)
 {
-	// 背景画像設定
-	renderer.SetBackground(IDB_BITMAP1);
-
 	// 配置位置のxとy
-	POINTFLOAT pos = { WND_SIZE.x / 2.0 , WND_SIZE.y / 2.0 };
+	POINTFLOAT pos = { (FLOAT)(WND_SIZE.x / 2.0) , (FLOAT)(WND_SIZE.y / 2.0) };
 
 	// 結果表示
 	renderer.DrawRequestText("HIGH SCORE", pos, 50, RGB(255, 255, 255), FW_BOLD);

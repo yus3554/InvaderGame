@@ -14,8 +14,8 @@ Game::Game(GameState* state, KeyStateManager* keyStateManager, Timer* timer)
 	this->shotManager = new ShotManager(this->timer);
 
 	// プレイヤー初期化
-	POINTFLOAT playerPos = { WND_SIZE.x / 2.0, WND_SIZE.y - 80.0 };
-	this->player = new NormalPlayer(playerPos, this->keyStateManager, this->shotManager, this->timer);
+	POINTFLOAT playerPos = { (FLOAT)(WND_SIZE.x / 2.0), (FLOAT)(WND_SIZE.y - 80.0) };
+	this->player = new HyperPlayer(playerPos, this->keyStateManager, this->shotManager, this->timer);
 
 	// エネミー初期化
 	this->enemyManager = new EnemyManager(this->shotManager, this->timer);
@@ -54,12 +54,12 @@ void Game::Update()
 
 void Game::DrawRequest(Renderer& renderer)
 {
+	ShotBase* shot;
+	COLORREF shotColor;
+
 	if (*(this->state) != STATE_GAME) {
 		return;
 	}
-
-	// 背景画像設定
-	renderer.SetBackground(IDB_BITMAP1);
 
 	// プレイヤー表示
 	renderer.DrawRequestRect(
@@ -81,10 +81,18 @@ void Game::DrawRequest(Renderer& renderer)
 	// ショット表示
 	for (int i = 0; i < this->shotManager->getListLength(); i++)
 	{
+		shot = dynamic_cast<ShotBase*>(this->shotManager->getActor(i));
+		if (shot == NULL)
+			throw "shotがNULLです。";
+
+		if (shot->GetIsPlayerShot())
+			shotColor = RGB(255, 255, 0);
+		else
+			shotColor = RGB(0, 255, 0);
+
 		renderer.DrawRequestRect(
-			this->shotManager->getActor(i)->getPos(),
-			this->shotManager->getActor(i)->GetWidth(), this->shotManager->getActor(i)->GetHeight(),
-			RGB(255, 255, 0), RGB(100, 100, 0), 1
+			shot->getPos(),	shot->GetWidth(), shot->GetHeight(),
+			shotColor, RGB(100, 100, 0), 1
 		);
 	}
 }

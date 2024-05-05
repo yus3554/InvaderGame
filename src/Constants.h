@@ -120,3 +120,36 @@ enum GameState
 	STATE_NUM
 };
 
+/// <summary>
+/// 画像のルートパス
+/// </summary>
+constexpr char resourceRootPath[100] = "C:/Users/Yusuke Ota/Development/github/InvaderGame/src/images/";
+
+/// <summary>
+/// ルートパス以下の背景画像パス
+/// </summary>
+constexpr char backgroundPath[20] = "background.bmp";
+
+/// <summary>
+/// ルートパス以下のプレイヤー画像パス
+/// </summary>
+constexpr char playerPath[1][20] = {
+	"player1.bmp"
+};
+
+/// <summary>
+/// ルートパス以下の敵画像パス
+/// </summary>
+constexpr char enemyPath[1][20] = {
+	"enemy1.bmp"
+};
+
+/// <summary>
+/// ルートパス以下の弾画像パス
+/// </summary>
+constexpr char shotPath[2][20] = {
+	"shot1.bmp",
+	"shot2.bmp"
+};
+
+

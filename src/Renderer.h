@@ -8,8 +8,10 @@
 class Renderer
 {
 private:
-	LinkedList<DrawInfo>* linkedList;
-	// LinkedList<DrawInfo>* renderLinkedList;
+	// 一時的なリンクドリスト（処理時に格納）
+	LinkedList<DrawInfo>* tempLinkedList;
+	// レンダリングするリンクドリスト（Render()時に描画）
+	LinkedList<DrawInfo>* renderLinkedList;
 
 	/// <summary>
 	/// ウィンドウ
@@ -37,6 +39,16 @@ private:
 	HBITMAP oldBMP;
 
 	/// <summary>
+	/// 
+	/// </summary>
+	BITMAPINFO backBMPInfo;
+
+	/// <summary>
+	/// 
+	/// </summary>
+	LPDWORD backPixelBits;
+
+	/// <summary>
 	/// インスタンスハンドル
 	/// </summary>
 	HINSTANCE hInstance;
@@ -45,11 +57,11 @@ private:
 public:
 	Renderer(HWND hwnd, HINSTANCE hInstance, int backgroundBitmapID);
 	~Renderer();
-	void SetBackground(int BITMAP_ID);
 	void Render();
-	// void CopyInfos();
+	void CopyInfos();
 	void DrawRequestText(const char* text, POINTFLOAT pos, int fontSize, COLORREF fontColor, int weight);
 	void DrawRequestLine();
 	void DrawRequestRect(POINTFLOAT pos, int width, int height, COLORREF backgroundColor, COLORREF borderColor, int borderWidth);
+	void DrawRequestImage(POINTFLOAT pos, int width, int height, BYTE* pixelBits);
 };
 

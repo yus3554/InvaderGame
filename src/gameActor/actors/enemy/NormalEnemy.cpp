@@ -17,9 +17,9 @@ void NormalEnemy::Update()
 			this->speed *= -1;
 		}
 	}
-	this->pos.x += this->speed * 60.0 / this->timer->getTargetFPS();
+	this->pos.x += (FLOAT)(this->speed * 60.0 / this->timer->getTargetFPS());
 
-	if (this->currentCount % (int)(this->timer->getTargetFPS() / 3) == 0)
+	if (this->currentCount % (int)(this->timer->getTargetFPS()) == 0)
 		this->shotManager->CreateShot<NormalShot>(this->pos, false);
 
 	this->currentCount++;

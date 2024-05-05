@@ -47,14 +47,11 @@ void Title::Update()
 
 void Title::DrawRequest(Renderer& renderer)
 {
-	// 背景画像設定
-	renderer.SetBackground(IDB_BITMAP1);
-
 	// すべてのメニューアイテムの取得
 	MenuItem** items = this->menuManager->getMenuItems();
 
 	// 配置位置のxとy
-	POINTFLOAT pos = { WND_SIZE.x / 2.0 , WND_SIZE.y / 2.0 };
+	POINTFLOAT pos = { (FLOAT)(WND_SIZE.x / 2.0) , (FLOAT)(WND_SIZE.y / 2.0) };
 
 	// タイトル
 	renderer.DrawRequestText(UI_TEXT_TITLE, pos, 50, RGB(255, 255, 255), FW_BOLD);

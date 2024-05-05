@@ -4,7 +4,8 @@ Renderer::Renderer(HWND hwnd, HINSTANCE hInstance, int backgroundBitmapID)
 {
 	this->backgroundBitmapID = backgroundBitmapID;
 	// infoListの初期化
-	this->linkedList = new LinkedList<DrawInfo>();
+	this->tempLinkedList = new LinkedList<DrawInfo>();
+	this->renderLinkedList = new LinkedList<DrawInfo>();
 
 	this->hwnd = hwnd;
 	this->hInstance = hInstance;
@@ -12,15 +13,25 @@ Renderer::Renderer(HWND hwnd, HINSTANCE hInstance, int backgroundBitmapID)
 	// ダブルバッファ設定
 	this->frontHDC = GetDC(hwnd);
 	this->backHDC = CreateCompatibleDC(this->frontHDC);
-	// this->backBMP = CreateCompatibleBitmap(this->frontHDC, WND_SIZE.x, WND_SIZE.y);
-	this->backBMP = LoadBitmap(hInstance, MAKEINTRESOURCE(this->backgroundBitmapID));
-	this->oldBMP = (HBITMAP)SelectObject(this->backHDC, this->backBMP);
+
+	// ウィンドウサイズで描画用BMPの用意
+	this->backBMPInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+	this->backBMPInfo.bmiHeader.biWidth = WND_SIZE.x;
+	this->backBMPInfo.bmiHeader.biHeight = -WND_SIZE.y;
+	this->backBMPInfo.bmiHeader.biPlanes = 1;
+	this->backBMPInfo.bmiHeader.biBitCount = 32;
+	this->backBMPInfo.bmiHeader.biCompression = BI_RGB;
+
+	this->backBMP = CreateDIBSection(this->backHDC, &this->backBMPInfo, DIB_RGB_COLORS, (void**)&this->backPixelBits, NULL, 0);
+	if (this->backBMP == NULL)
+		throw "backBMPがNULLです。";
 }
 
 Renderer::~Renderer()
 {
 	// infoListの削除
-	delete this->linkedList;
+	delete this->tempLinkedList;
+	delete this->renderLinkedList;
 
 	// ダブルバッファの削除
 	SelectObject(this->backHDC, this->oldBMP);
@@ -35,44 +46,57 @@ Renderer::~Renderer()
 void Renderer::Render()
 {
 	// background
-	this->backBMP = LoadBitmap(this->hInstance, MAKEINTRESOURCE(this->backgroundBitmapID));
-	this->oldBMP = (HBITMAP)SelectObject(this->backHDC, this->backBMP);
+	// this->DrawRequestImage({ 0.0, 0.0 }, WND_SIZE.x, WND_SIZE.y, );
 
 	// drawinfoを描画
-	for (int i = 0; i < this->linkedList->getLength(); i++)
+	for (int i = 0; i < this->renderLinkedList->getLength(); i++)
 	{
-		DrawInfo* info = this->linkedList->pop();
+		DrawInfo* info = this->renderLinkedList->pop();
 		info->render(this->backHDC);
 		delete info;
+		i--;
 	}
 
-	// ダブルバッファのバック側のHDCをフロント側に転送
+	// 描画用BMPをbackHDCに付与し、BitBltでfrontHDCに転送
+	this->oldBMP = (HBITMAP)SelectObject(this->backHDC, this->backBMP);
 	BitBlt(this->frontHDC, 0, 0, WND_SIZE.x, WND_SIZE.y, this->backHDC, 0, 0, SRCCOPY);
 }
 
-void Renderer::SetBackground(int backgroundBitmapID)
+void Renderer::CopyInfos()
 {
-	this->backgroundBitmapID = backgroundBitmapID;
+	// tempLinkdListからrenderLinkedListに中身をコピーし、tempLinkedListをリセットする。
+	this->renderLinkedList->clear();
+	Node<DrawInfo>* head = this->tempLinkedList->getHead();
+	int length = this->tempLinkedList->getLength();
+	this->renderLinkedList->Substitute(head, length);
+	this->tempLinkedList->Substitute(NULL, 0);
 }
 
 void Renderer::DrawRequestText(const char* text, POINTFLOAT pos, int fontSize, COLORREF fontColor, int weight)
 {
-	POINT posLONG = { pos.x, pos.y };
+	POINT posLONG = { (LONG)pos.x, (LONG)pos.y };
 	DrawTextInfo* info = new DrawTextInfo(text, posLONG, fontSize, fontColor, weight);
-	this->linkedList->add(info);
+	this->tempLinkedList->add(info);
 }
 
 
 void Renderer::DrawRequestLine()
 {
 	// auto info = new DrawLineInfo();
-	// this->linkedList->add(info);
+	// this->tempLinkedList->add(info);
 }
 
 void Renderer::DrawRequestRect(
 	POINTFLOAT pos, int width, int height, COLORREF backgroundColor, COLORREF borderColor, int borderWidth)
 {
-	POINT posLONG = { pos.x, pos.y };
+	POINT posLONG = { (LONG)pos.x, (LONG)pos.y };
 	auto info = new DrawRectInfo(posLONG, width, height, backgroundColor, borderColor, borderWidth);
-	this->linkedList->add(info);
+	this->tempLinkedList->add(info);
+}
+
+void Renderer::DrawRequestImage(POINTFLOAT pos, int width, int height, BYTE* pixelBits)
+{
+	POINT posLONG = { (LONG)pos.x, (LONG)pos.y };
+	auto info = new DrawImageInfo(posLONG, width, height, pixelBits, this->backPixelBits);
+	this->tempLinkedList->add(info);
 }

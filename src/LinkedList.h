@@ -23,6 +23,8 @@ private:
 public:
 	LinkedList();
 	~LinkedList();
+	Node<T>* getHead();
+	void Substitute(Node<T>* head, int length);
 	int getLength();
 	void add(T* value);
 	T* pop();
@@ -43,6 +45,20 @@ template <typename T>
 LinkedList<T>::~LinkedList()
 {
 	this->clear();
+}
+
+template <typename T>
+Node<T>* LinkedList<T>::getHead()
+{
+	return this->head;
+}
+
+template <typename T>
+void LinkedList<T>::Substitute(Node<T>* head, int length)
+{
+	// head‚Ælength‚ð‘ã“ü‚·‚éB
+	this->head = head;
+	this->length = length;
 }
 
 template <typename T>

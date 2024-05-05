@@ -1,5 +1,6 @@
 #include <windows.h>
 #include <stdio.h>
+#pragma comment(lib, "winmm.lib")
 #include "Constants.h"
 #include "Timer.h"
 #include "./gameScene/GameScenes.h"
@@ -33,6 +34,20 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	}
 
 	return DefWindowProc(hwnd, msg, wParam, lParam);
+}
+
+
+/// <summary>
+/// レンダーを行うスレッド 
+/// </summary>
+/// <param name="lParam"></param>
+/// <returns></returns>
+DWORD WINAPI ThreadFunc(LPVOID renderer)
+{
+	// レンダリング
+	((Renderer*)renderer)->Render();
+
+	return 0;
 }
 
 
@@ -86,7 +101,9 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 	HighScore highScore = HighScore(&state, &keyStateManager);
 	// レンダラー
 	Renderer renderer = Renderer(hwnd, hInstance, IDB_BITMAP1);
-	
+	// スレッド関連
+	HANDLE hThread;
+	DWORD dwThreadId;
 
 	// メッセージループ（WM_QUIT時のみループを抜ける）
 	while (true)
@@ -99,6 +116,12 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 			DispatchMessage(&msg);
 		}
 		else {
+			/*JOYINFO joyInfo;
+			if (joyGetPos(JOYSTICKID2, &joyInfo) != JOYERR_NOERROR)
+				return 0;
+			sprintf_s(fpsStr, sizeof(fpsStr), "%d", joyInfo.wButtons);
+			OutputDebugString(fpsStr);*/
+
 			// エスケープキー押下 or StateがQuit の場合に終了
 			if (KEYDOWN(VK_ESCAPE) || state == STATE_QUIT)
 			{
@@ -111,6 +134,17 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 			// メイン処理
 			for (int i = 0; i < loop; i++)
 			{
+				//スレッド起動
+				hThread = CreateThread(
+					NULL, //セキュリティ属性
+					0, //スタックサイズ
+					ThreadFunc, //スレッド関数
+					(LPVOID)&renderer, //スレッド関数に渡す引数
+					0, //作成オプション(0またはCREATE_SUSPENDED)
+					&dwThreadId);//スレッドID
+				if (hThread == NULL)
+					return 0;
+
 				// キー入力アップデート
 				keyStateManager.update();
 
@@ -141,8 +175,8 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 					highScore.DrawRequest(renderer);
 				}
 
-				// レンダリング
-				renderer.Render();
+				WaitForSingleObject(hThread, INFINITE);
+				renderer.CopyInfos();
 			}
 
 			// TODO: やっぱ待たないとCPU使用率がやばい
