@@ -3,6 +3,7 @@
 #include <windows.h>
 #include "../Constants.h"
 #include "../ResourceManager.h"
+#include <math.h>
 
 class DrawImageInfo :
     public DrawInfo
@@ -10,7 +11,8 @@ class DrawImageInfo :
 private:
     ResourceData* resourceData;
     LPDWORD backPixelBits;
+    int pixelOffset;
 public:
-    DrawImageInfo(POINT pos, ResourceData* resourceData, LPDWORD backPixelBits);
+    DrawImageInfo(POINT pos, ResourceData* resourceData, LPDWORD backPixelBits, int pixelOffset);
     void render(HDC hdc);
 };

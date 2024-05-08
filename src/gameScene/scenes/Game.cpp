@@ -64,7 +64,7 @@ void Game::DrawRequest(Renderer& renderer)
 	// プレイヤー表示
 	renderer.DrawRequestImage(
 		this->player->getPos(),
-		this->resourceManager->GetResourceData(RESOURCE_PLAYER, 0)
+		this->resourceManager->GetResourceData(RESOURCE_PLAYER, 0), 0
 	);
 
 	// エネミー表示
@@ -72,7 +72,7 @@ void Game::DrawRequest(Renderer& renderer)
 	{
 		renderer.DrawRequestImage(
 			this->enemyManager->getActor(i)->getPos(),
-			this->resourceManager->GetResourceData(RESOURCE_ENEMY, 0)
+			this->resourceManager->GetResourceData(RESOURCE_ENEMY, 0), 0
 		);
 	}
 
@@ -90,7 +90,7 @@ void Game::DrawRequest(Renderer& renderer)
 
 		renderer.DrawRequestImage(
 			shot->getPos(),
-			this->resourceManager->GetResourceData(RESOURCE_SHOT, shotIndex)
+			this->resourceManager->GetResourceData(RESOURCE_SHOT, shotIndex), 0
 		);
 	}
 }

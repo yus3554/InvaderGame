@@ -100,9 +100,9 @@ void Renderer::DrawRequestRect(
 	this->tempLinkedList->add(info);
 }
 
-void Renderer::DrawRequestImage(POINTFLOAT pos, ResourceData* resourceData)
+void Renderer::DrawRequestImage(POINTFLOAT pos, ResourceData* resourceData, int pixelOffset)
 {
 	POINT posLONG = { (LONG)pos.x, (LONG)pos.y };
-	auto info = new DrawImageInfo(posLONG, resourceData, this->backPixelBits);
+	auto info = new DrawImageInfo(posLONG, resourceData, this->backPixelBits, pixelOffset);
 	this->tempLinkedList->add(info);
 }

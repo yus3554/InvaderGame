@@ -7,6 +7,20 @@
 #include "Renderer.h"
 #include "ResourceManager.h"
 
+
+struct ThreadArgs
+{
+	ThreadArgs(bool isFor, Renderer* renderer);
+	bool isFor;
+	Renderer* renderer;
+};
+
+ThreadArgs::ThreadArgs(bool isFor, Renderer* renderer)
+{
+	this->isFor = isFor;
+	this->renderer = renderer;
+}
+
 /// <summary>
 /// ウィンドウプロシージャ
 /// </summary>
@@ -44,10 +58,25 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 /// </summary>
 /// <param name="lParam"></param>
 /// <returns></returns>
-DWORD WINAPI ThreadFunc(LPVOID renderer)
+DWORD WINAPI ThreadFunc(LPVOID lParam)
 {
-	// レンダリング
-	((Renderer*)renderer)->Render();
+	HANDLE hEvent;
+	ThreadArgs* threadArgs = (ThreadArgs*)lParam;
+
+	while (threadArgs->isFor)
+	{
+		hEvent = OpenEvent(EVENT_ALL_ACCESS, FALSE, "event");
+		if (hEvent == NULL)
+			return 0;
+		WaitForSingleObject(hEvent, INFINITE);
+		ResetEvent(hEvent);
+
+		// レンダリング
+		threadArgs->renderer->Render();
+		
+		SetEvent(hEvent);
+		CloseHandle(hEvent);
+	}
 
 	return 0;
 }
@@ -108,6 +137,27 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 	HANDLE hThread;
 	DWORD dwThreadId;
 
+	// 背景pixelOffset用（スクロール）
+	int backgroundPixelOffset = 0;
+
+	//スレッド起動
+	ThreadArgs threadArgs = {true, &renderer};
+	hThread = CreateThread(
+		NULL, //セキュリティ属性
+		0, //スタックサイズ
+		ThreadFunc, //スレッド関数
+		(LPVOID)&threadArgs, //スレッド関数に渡す引数
+		0, //作成オプション(0またはCREATE_SUSPENDED)
+		&dwThreadId//スレッドID
+	);
+	if (hThread == NULL)
+		return 0;
+
+	// スレッド用イベント
+	HANDLE hEvent = CreateEvent(NULL, TRUE, FALSE, "event");
+	if (hEvent == NULL)
+		return 0;
+
 	// メッセージループ（WM_QUIT時のみループを抜ける）
 	while (true)
 	{
@@ -128,6 +178,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 			// エスケープキー押下 or StateがQuit の場合に終了
 			if (KEYDOWN(VK_ESCAPE) || state == STATE_QUIT)
 			{
+				threadArgs.isFor = false;
 				SendMessage(hwnd, WM_CLOSE, 0, 0);
 			}
 
@@ -137,25 +188,18 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 			// メイン処理
 			for (int i = 0; i < loop; i++)
 			{
-				//スレッド起動
-				hThread = CreateThread(
-					NULL, //セキュリティ属性
-					0, //スタックサイズ
-					ThreadFunc, //スレッド関数
-					(LPVOID)&renderer, //スレッド関数に渡す引数
-					0, //作成オプション(0またはCREATE_SUSPENDED)
-					&dwThreadId);//スレッドID
-				if (hThread == NULL)
-					return 0;
+				SetEvent(hEvent);
 
 				// キー入力アップデート
 				keyStateManager.update();
 
-				// アップデート / 画面描画リクエスト
+				// 背景描画
 				renderer.DrawRequestImage(
 					{ 0.0, 0.0 },
-					resourceManager.GetResourceData(RESOURCE_BACKGROUND, 0)
+					resourceManager.GetResourceData(RESOURCE_BACKGROUND, 0),
+					WND_SIZE.x * backgroundPixelOffset
 				);
+				backgroundPixelOffset--;
 
 				// FPS表示
 				sprintf_s(fpsStr, sizeof(fpsStr), "%5lf FPS", timer.getRealFPS());
@@ -183,7 +227,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 					highScore.DrawRequest(renderer);
 				}
 
-				WaitForSingleObject(hThread, INFINITE);
+				WaitForSingleObject(hEvent, INFINITE);
 				renderer.CopyInfos();
 			}
 

@@ -63,6 +63,6 @@ public:
 	void DrawRequestText(const char* text, POINTFLOAT pos, int fontSize, COLORREF fontColor, int weight);
 	void DrawRequestLine();
 	void DrawRequestRect(POINTFLOAT pos, int width, int height, COLORREF backgroundColor, COLORREF borderColor, int borderWidth);
-	void DrawRequestImage(POINTFLOAT pos, ResourceData* resourceData);
+	void DrawRequestImage(POINTFLOAT pos, ResourceData* resourceData, int pixelOffset);
 };
 

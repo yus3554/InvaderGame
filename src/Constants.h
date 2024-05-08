@@ -165,14 +165,14 @@ constexpr char BACKGROUND_FILEPATHS[2][20] =
 /// ルートパス以下のプレイヤー画像パス
 /// </summary>
 constexpr char PLAYER_FILEPATHS[1][20] = {
-	"player1.bmp"
+	"enemy1.bmp"
 };
 
 /// <summary>
 /// ルートパス以下の敵画像パス
 /// </summary>
 constexpr char ENEMY_FILEPATHS[1][20] = {
-	"enemy1.bmp"
+	"player1.bmp"
 };
 
 /// <summary>
