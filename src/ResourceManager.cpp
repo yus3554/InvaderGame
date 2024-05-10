@@ -17,6 +17,7 @@ ResourceManager::ResourceManager()
 {
 	this->backgroundsResourceList = new LinkedList<ResourceData>();
 	this->playersResourceList = new LinkedList<ResourceData>();
+	this->explosionsResourceList = new LinkedList<ResourceData>();
 	this->enemiesResourceList = new LinkedList<ResourceData>();
 	this->shotsResourceList = new LinkedList<ResourceData>();
 }
@@ -25,6 +26,7 @@ ResourceManager::~ResourceManager()
 {
 	delete this->backgroundsResourceList;
 	delete this->playersResourceList;
+	delete this->explosionsResourceList;
 	delete this->enemiesResourceList;
 	delete this->shotsResourceList;
 }
@@ -43,6 +45,10 @@ void ResourceManager::Load(ResourceType type, int resourceIndex)
 	case RESOURCE_PLAYER:
 		list = this->playersResourceList;
 		strcat_s(filepath, PLAYER_FILEPATHS[resourceIndex]);
+		break;
+	case RESOURCE_EXPLOSION:
+		list = this->explosionsResourceList;
+		strcat_s(filepath, EXPLOSION_FILEPATHS[resourceIndex]);
 		break;
 	case RESOURCE_ENEMY:
 		list = this->enemiesResourceList;
@@ -159,6 +165,9 @@ ResourceData* ResourceManager::GetResourceData(ResourceType type, int resourceIn
 		break;
 	case RESOURCE_PLAYER:
 		list = this->playersResourceList;
+		break;
+	case RESOURCE_EXPLOSION:
+		list = this->explosionsResourceList;
 		break;
 	case RESOURCE_ENEMY:
 		list = this->enemiesResourceList;

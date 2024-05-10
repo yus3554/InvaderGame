@@ -7,14 +7,15 @@ Game::Game(GameState* state, KeyStateManager* keyStateManager, Timer* timer, Res
 	this->keyStateManager = keyStateManager;
 	this->state = state;
 	this->timer = timer;
-	this->isGameOver = false;
-	this->isClear = false;
+	this->innerState = PLAY;
+	this->playerDeathFrame = 0;
+	this->playerExplosionResourceIndex = 0;
 
 	// ショット管理初期化（必ず一番最初。playerとenemyで使用するため。）
 	this->shotManager = new ShotManager(this->timer);
 
 	// プレイヤー初期化
-	POINTFLOAT playerPos = { (FLOAT)(WND_SIZE.x / 2.0), (FLOAT)(WND_SIZE.y - 80.0) };
+	POINTFLOAT playerPos = { (FLOAT)(WND_SIZE.x / 2.0), (FLOAT)(WND_SIZE.y - 100.0) };
 	this->player = new NormalPlayer(playerPos, this->keyStateManager, this->shotManager, this->timer);
 
 	// エネミー初期化
@@ -38,16 +39,30 @@ void Game::Update()
 	}
 	
 	// プレイヤーのupdate
-	this->player->Update();
+	if (this->innerState == PLAY)
+		this->player->Update();
 	// 各マネージャーのupdate
 	this->enemyManager->Update();
 	this->shotManager->Update();
 	// 当たり判定確認
-	this->HitCheckPlayer();
-	this->HitCheckEnemy();
+	if (this->innerState == PLAY)
+	{
+		this->HitCheckPlayer();
+		this->HitCheckEnemy();
+	}
+
+	// プリゲームオーバー時
+	if (this->innerState == PRE_GAMEOVER)
+	{
+		// TODO: 本来であれば、Playerとかにこの辺は持たせた方が良いが、突貫実装のためGame.cppで全部書いている
+		// TODO: また、何秒で何枚のエフェクト画像を切り替えるかも、定数とかFPSによって切り替えるべきだが、ひとまずハードコーディングしている
+		this->playerExplosionResourceIndex = (this->timer->getNowFrame() - this->playerDeathFrame) / 2;
+		if (this->playerExplosionResourceIndex >= 10)
+			this->innerState = GAMEOVER;
+	}
 
 	// ゲームオーバー or クリア時
-	if (this->isGameOver || this->isClear) {
+	if (this->innerState == GAMEOVER || this->innerState == CLEAR) {
 		this->GameFinalize();
 	}
 }
@@ -60,12 +75,6 @@ void Game::DrawRequest(Renderer& renderer)
 	if (*(this->state) != STATE_GAME) {
 		return;
 	}
-
-	// プレイヤー表示
-	renderer.DrawRequestImage(
-		this->player->getPos(),
-		this->resourceManager->GetResourceData(RESOURCE_PLAYER, 0), 0
-	);
 
 	// エネミー表示
 	for (int i = 0; i < this->enemyManager->getListLength(); i++)
@@ -92,6 +101,28 @@ void Game::DrawRequest(Renderer& renderer)
 			shot->getPos(),
 			this->resourceManager->GetResourceData(RESOURCE_SHOT, shotIndex), 0
 		);
+	}
+
+
+	// プレイヤー表示
+	if (this->innerState == PLAY)
+		renderer.DrawRequestImage(
+			this->player->getPos(),
+			this->resourceManager->GetResourceData(RESOURCE_PLAYER, 0), 0
+		);
+	// プレイヤー爆発エフェクト表示
+	if (this->innerState == PRE_GAMEOVER)
+	{
+		if (this->playerExplosionResourceIndex < 6)
+			// TODO: エフェクト画像のサイズとプレイヤーの画像サイズが異なるため、左上を原点にすると位置がずれてしまう。そのため-16している
+			// TODO: が、もちろんこんなハードコーディングは良くない
+			renderer.DrawRequestImage(
+				{
+					this->player->getPos().x - 16,
+					this->player->getPos().y - 16
+				},
+				this->resourceManager->GetResourceData(RESOURCE_EXPLOSION, this->playerExplosionResourceIndex), 0
+			);
 	}
 }
 
@@ -150,8 +181,7 @@ void Game::GameFinalize()
 	this->isNeedInit = true;
 
 	// isGameOverとisClearを初期化
-	this->isClear = false;
-	this->isGameOver = false;
+	this->innerState = PLAY;
 
 	// ステートを変更
 	*(this->state) = STATE_RESULT;
@@ -172,7 +202,8 @@ void Game::HitCheckPlayer()
 		bool isHit = IntersectRect(&intersectRect, &playerRect, &shotRect);
 		if (isHit)
 		{
-			this->isGameOver = true;
+			this->innerState = PRE_GAMEOVER;
+			this->playerDeathFrame = timer->getNowFrame();
 			return;
 		}
 	}

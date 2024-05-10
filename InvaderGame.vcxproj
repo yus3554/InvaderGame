@@ -155,8 +155,6 @@
     <ClCompile Include="src\Renderer.cpp" />
     <ClCompile Include="src\gameScene\GameScene.cpp" />
     <ClCompile Include="src\KeyStateManager.cpp" />
-    <ClCompile Include="src\old\DrawManager.cpp" />
-    <ClCompile Include="src\old\GameManager.cpp" />
     <ClCompile Include="src\MenuManager.cpp" />
     <ClCompile Include="src\Constants.h" />
     <ClCompile Include="src\WinMain.cpp" />
@@ -193,19 +191,11 @@
     <ClInclude Include="src\Renderer.h" />
     <ClInclude Include="src\gameScene\GameObject.h" />
     <ClInclude Include="src\gameScene\GameScene.h" />
-    <ClInclude Include="src\resource.h" />
     <ClInclude Include="src\KeyStateManager.h" />
-    <ClInclude Include="src\old\DrawManager.h" />
     <ClInclude Include="src\old\GameManager.h" />
     <ClInclude Include="src\MenuManager.h" />
     <ClInclude Include="src\Timer.h" />
     <ClInclude Include="src\gameScene\scenes\Title.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="src\Resource.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="src\images\background.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

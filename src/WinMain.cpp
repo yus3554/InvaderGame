@@ -228,7 +228,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 				}
 
 				WaitForSingleObject(hEvent, INFINITE);
-				renderer.CopyInfos();
+				renderer.SwitchDrawInfoList();
 			}
 
 			// TODO: ‚â‚Á‚Ï‘Ò‚½‚È‚¢‚ÆCPUŽg—p—¦‚ª‚â‚Î‚¢

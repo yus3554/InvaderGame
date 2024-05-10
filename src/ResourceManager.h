@@ -19,6 +19,7 @@ class ResourceManager
 private:
 	LinkedList<ResourceData>* backgroundsResourceList;
 	LinkedList<ResourceData>* playersResourceList;
+	LinkedList<ResourceData>* explosionsResourceList;
 	LinkedList<ResourceData>* enemiesResourceList;
 	LinkedList<ResourceData>* shotsResourceList;
 

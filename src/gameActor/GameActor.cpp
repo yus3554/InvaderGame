@@ -32,7 +32,7 @@ RECT GameActor::GetRect()
 	return rect;
 }
 
-int GameActor::GetWidth()
+int GameActor::GetWidth() const
 {
 	return this->width;
 }

@@ -136,6 +136,11 @@ enum ResourceType
 	RESOURCE_PLAYER,
 
 	/// <summary>
+	/// 爆発エフェクト
+	/// </summary>
+	RESOURCE_EXPLOSION,
+
+	/// <summary>
 	/// 敵
 	/// </summary>
 	RESOURCE_ENEMY,
@@ -166,6 +171,18 @@ constexpr char BACKGROUND_FILEPATHS[2][20] =
 /// </summary>
 constexpr char PLAYER_FILEPATHS[1][20] = {
 	"enemy1.bmp"
+};
+
+/// <summary>
+/// ルートパス以下の爆発エフェクト画像パス
+/// </summary>
+constexpr char EXPLOSION_FILEPATHS[6][20] = {
+	"explosion1.bmp",
+	"explosion2.bmp",
+	"explosion3.bmp",
+	"explosion4.bmp",
+	"explosion5.bmp",
+	"explosion6.bmp"
 };
 
 /// <summary>

@@ -8,6 +8,14 @@
 #include "../../ResourceManager.h"
 #include <stdio.h>
 
+enum InnerState
+{
+    PLAY,
+    PRE_GAMEOVER,
+    GAMEOVER,
+    CLEAR
+};
+
 class Game :
     public GameScene
 {
@@ -18,8 +26,9 @@ private:
     EnemyManager* enemyManager;
     ShotManager* shotManager;
     Timer* timer;
-    bool isGameOver;
-    bool isClear;
+    InnerState innerState;
+    int playerDeathFrame;
+    int playerExplosionResourceIndex;
 public:
     Game(GameState* state, KeyStateManager* keyStateManager, Timer* timer, ResourceManager* resourceManager);
     ~Game();

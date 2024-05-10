@@ -4,6 +4,7 @@
 Timer::Timer(int targetFPS) {
 	this->targetFPS = targetFPS;
 	this->realFPS = 0.0;
+	this->nowFrame = 0;
 	QueryPerformanceFrequency(&this->cpuFreq);
 	QueryPerformanceCounter(&startCount);
 	QueryPerformanceCounter(&beforeCount);
@@ -14,7 +15,6 @@ int Timer::getDiffFrame()
 {
 	int loop;
 	LARGE_INTEGER nowCount;
-	int nowFrame;
 	int beforeFrame;
 	double diffTime;
 
@@ -23,11 +23,11 @@ int Timer::getDiffFrame()
 
 	// スタートカウントとnowカウントとの差分から、現在のフレーム数を出す
 	beforeFrame = (int)((double)(beforeCount.QuadPart - this->startCount.QuadPart) / ((double)cpuFreq.QuadPart / this->targetFPS));
-	nowFrame = (int)((double)(nowCount.QuadPart - this->startCount.QuadPart) / ((double)cpuFreq.QuadPart / this->targetFPS));
+	this->nowFrame = (int)((double)(nowCount.QuadPart - this->startCount.QuadPart) / ((double)cpuFreq.QuadPart / this->targetFPS));
 
 	// 現在のフレームのほうがbeforeフレームより大きくなった場合に、その差分をloopにいれる
-	if (nowFrame > beforeFrame) {
-		loop = nowFrame - beforeFrame;
+	if (this->nowFrame > beforeFrame) {
+		loop = this->nowFrame - beforeFrame;
 
 		// realFPS計算
 		diffTime = (double)(nowCount.QuadPart - this->beforeCount.QuadPart) / cpuFreq.QuadPart;
@@ -44,15 +44,18 @@ int Timer::getDiffFrame()
 }
 
 
-int Timer::getTargetFPS()
+int Timer::getTargetFPS() const
 {
 	return this->targetFPS;
 }
 
 
-double Timer::getRealFPS()
+double Timer::getRealFPS() const
 {
 	return this->realFPS;
 }
 
-
+int Timer::getNowFrame() const
+{
+	return this->nowFrame;
+}

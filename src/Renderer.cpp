@@ -2,9 +2,7 @@
 
 Renderer::Renderer(HWND hwnd, HINSTANCE hInstance, ResourceManager* resourceManager)
 {
-	// infoListの初期化
-	this->tempLinkedList = new LinkedList<DrawInfo>();
-	this->renderLinkedList = new LinkedList<DrawInfo>();
+	this->drawInfoListIndex = 0;
 
 	this->hwnd = hwnd;
 	this->hInstance = hInstance;
@@ -34,14 +32,16 @@ Renderer::Renderer(HWND hwnd, HINSTANCE hInstance, ResourceManager* resourceMana
 	this->resourceManager->Load(RESOURCE_ENEMY, 0);
 	this->resourceManager->Load(RESOURCE_SHOT, 0);
 	this->resourceManager->Load(RESOURCE_SHOT, 1);
+	this->resourceManager->Load(RESOURCE_EXPLOSION, 0);
+	this->resourceManager->Load(RESOURCE_EXPLOSION, 1);
+	this->resourceManager->Load(RESOURCE_EXPLOSION, 2);
+	this->resourceManager->Load(RESOURCE_EXPLOSION, 3);
+	this->resourceManager->Load(RESOURCE_EXPLOSION, 4);
+	this->resourceManager->Load(RESOURCE_EXPLOSION, 5);
 }
 
 Renderer::~Renderer()
 {
-	// infoListの削除
-	delete this->tempLinkedList;
-	delete this->renderLinkedList;
-
 	// ダブルバッファの削除
 	SelectObject(this->backHDC, this->oldBMP);
 	DeleteObject(this->backBMP);
@@ -55,9 +55,9 @@ Renderer::~Renderer()
 void Renderer::Render()
 {
 	// drawinfoを描画
-	for (int i = 0; i < this->renderLinkedList->getLength(); i++)
+	for (int i = 0; i < this->drawInfoList[!this->drawInfoListIndex].getLength(); i++)
 	{
-		DrawInfo* info = this->renderLinkedList->pop();
+		DrawInfo* info = this->drawInfoList[!this->drawInfoListIndex].pop();
 		info->render(this->backHDC);
 		delete info;
 		i--;
@@ -68,21 +68,28 @@ void Renderer::Render()
 	BitBlt(this->frontHDC, 0, 0, WND_SIZE.x, WND_SIZE.y, this->backHDC, 0, 0, SRCCOPY);
 }
 
-void Renderer::CopyInfos()
+/// <summary>
+/// レンダー用とDrawRequest用とでIndexを切り替える
+/// </summary>
+void Renderer::SwitchDrawInfoList()
 {
-	// tempLinkdListからrenderLinkedListに中身をコピーし、tempLinkedListをリセットする。
-	this->renderLinkedList->clear();
-	Node<DrawInfo>* head = this->tempLinkedList->getHead();
-	int length = this->tempLinkedList->getLength();
-	this->renderLinkedList->Substitute(head, length);
-	this->tempLinkedList->Substitute(NULL, 0);
+	this->drawInfoListIndex = !this->drawInfoListIndex;
 }
 
+
+/// <summary>
+/// テキスト描画をリクエストする。
+/// </summary>
+/// <param name="text">表示したいテキスト</param>
+/// <param name="pos">表示したい位置</param>
+/// <param name="fontSize">フォントサイズ</param>
+/// <param name="fontColor">フォントカラー</param>
+/// <param name="weight">太さ</param>
 void Renderer::DrawRequestText(const char* text, POINTFLOAT pos, int fontSize, COLORREF fontColor, int weight)
 {
 	POINT posLONG = { (LONG)pos.x, (LONG)pos.y };
 	DrawTextInfo* info = new DrawTextInfo(text, posLONG, fontSize, fontColor, weight);
-	this->tempLinkedList->add(info);
+	this->drawInfoList[this->drawInfoListIndex].add(info);
 }
 
 
@@ -92,17 +99,32 @@ void Renderer::DrawRequestLine()
 	// this->tempLinkedList->add(info);
 }
 
+/// <summary>
+/// 長方形描画をリクエストする。
+/// </summary>
+/// <param name="pos"></param>
+/// <param name="width"></param>
+/// <param name="height"></param>
+/// <param name="backgroundColor"></param>
+/// <param name="borderColor"></param>
+/// <param name="borderWidth"></param>
 void Renderer::DrawRequestRect(
 	POINTFLOAT pos, int width, int height, COLORREF backgroundColor, COLORREF borderColor, int borderWidth)
 {
 	POINT posLONG = { (LONG)pos.x, (LONG)pos.y };
 	auto info = new DrawRectInfo(posLONG, width, height, backgroundColor, borderColor, borderWidth);
-	this->tempLinkedList->add(info);
+	this->drawInfoList[this->drawInfoListIndex].add(info);
 }
 
+/// <summary>
+/// 画像描画をリクエストする。
+/// </summary>
+/// <param name="pos"></param>
+/// <param name="resourceData"></param>
+/// <param name="pixelOffset"></param>
 void Renderer::DrawRequestImage(POINTFLOAT pos, ResourceData* resourceData, int pixelOffset)
 {
 	POINT posLONG = { (LONG)pos.x, (LONG)pos.y };
 	auto info = new DrawImageInfo(posLONG, resourceData, this->backPixelBits, pixelOffset);
-	this->tempLinkedList->add(info);
+	this->drawInfoList[this->drawInfoListIndex].add(info);
 }

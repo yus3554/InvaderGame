@@ -29,6 +29,11 @@ private:
 	/// </summary>
 	LARGE_INTEGER beforeCount;
 
+	/// <summary>
+	/// 今のフレーム
+	/// </summary>
+	int nowFrame;
+
 public:
 	/// <summary>
 	/// コンストラクタ
@@ -46,12 +51,18 @@ public:
 	/// 目標とするFPSを取得
 	/// </summary>
 	/// <returns>目標とするFPS</returns>
-	int getTargetFPS();
+	int getTargetFPS() const;
 
 	/// <summary>
 	/// FPSの実測値を取得
 	/// </summary>
 	/// <returns>FPSの実測値</returns>
-	double getRealFPS();
+	double getRealFPS() const;
+
+	/// <summary>
+	/// 現在のフレームを取得
+	/// </summary>
+	/// <returns></returns>
+	int getNowFrame() const;
 };
 

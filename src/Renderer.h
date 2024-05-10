@@ -8,10 +8,8 @@
 class Renderer
 {
 private:
-	// 一時的なリンクドリスト（処理時に格納）
-	LinkedList<DrawInfo>* tempLinkedList;
-	// レンダリングするリンクドリスト（Render()時に描画）
-	LinkedList<DrawInfo>* renderLinkedList;
+	LinkedList<DrawInfo> drawInfoList[2];
+	bool drawInfoListIndex;
 
 	ResourceManager* resourceManager;
 
@@ -59,7 +57,7 @@ public:
 	Renderer(HWND hwnd, HINSTANCE hInstance, ResourceManager* resourceManager);
 	~Renderer();
 	void Render();
-	void CopyInfos();
+	void SwitchDrawInfoList();
 	void DrawRequestText(const char* text, POINTFLOAT pos, int fontSize, COLORREF fontColor, int weight);
 	void DrawRequestLine();
 	void DrawRequestRect(POINTFLOAT pos, int width, int height, COLORREF backgroundColor, COLORREF borderColor, int borderWidth);

@@ -17,7 +17,7 @@ public:
 	POINTFLOAT getPos();
 	void InitPos();
 	RECT GetRect();
-	int GetWidth();
+	int GetWidth() const;
 	int GetHeight();
 };
 
