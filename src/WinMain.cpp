@@ -8,17 +8,30 @@
 #include "ResourceManager.h"
 
 
-struct ThreadArgs
+struct RenderThreadArgs
 {
-	ThreadArgs(bool isFor, Renderer* renderer);
+	RenderThreadArgs(bool isFor, Renderer* renderer);
 	bool isFor;
 	Renderer* renderer;
 };
 
-ThreadArgs::ThreadArgs(bool isFor, Renderer* renderer)
+RenderThreadArgs::RenderThreadArgs(bool isFor, Renderer* renderer)
 {
 	this->isFor = isFor;
 	this->renderer = renderer;
+}
+
+struct ResourceLoadThreadArgs
+{
+	ResourceLoadThreadArgs(bool isFor, ResourceManager* manager);
+	bool isFor;
+	ResourceManager* manager;
+};
+
+ResourceLoadThreadArgs::ResourceLoadThreadArgs(bool isFor, ResourceManager* manager)
+{
+	this->isFor = isFor;
+	this->manager = manager;
 }
 
 /// <summary>
@@ -58,26 +71,52 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 /// </summary>
 /// <param name="lParam"></param>
 /// <returns></returns>
-DWORD WINAPI ThreadFunc(LPVOID lParam)
+DWORD WINAPI RenderThreadFunc(LPVOID lParam)
 {
-	HANDLE hEvent;
-	ThreadArgs* threadArgs = (ThreadArgs*)lParam;
+	HANDLE hEventBegin = OpenEvent(EVENT_ALL_ACCESS, FALSE, EVENT_NAME_RENDER_BEGIN);
+	HANDLE hEventEnd = OpenEvent(EVENT_ALL_ACCESS, FALSE, EVENT_NAME_RENDER_END);
+	if (hEventBegin == NULL || hEventEnd == NULL)
+		return 0;
+	RenderThreadArgs* args = (RenderThreadArgs*)lParam;
 
-	while (threadArgs->isFor)
+	while (args->isFor)
 	{
-		hEvent = OpenEvent(EVENT_ALL_ACCESS, FALSE, "event");
-		if (hEvent == NULL)
-			return 0;
+		WaitForSingleObject(hEventBegin, INFINITE);
+		ResetEvent(hEventBegin);
+
+		// レンダリング
+		args->renderer->Render();
+		
+		SetEvent(hEventEnd);
+	}
+
+	CloseHandle(hEventBegin);
+	CloseHandle(hEventEnd);
+	return 0;
+}
+
+/// <summary>
+/// リソースロードを行うスレッド 
+/// </summary>
+/// <param name="lParam"></param>
+/// <returns></returns>
+DWORD WINAPI ResourceLoadThreadFunc(LPVOID lParam)
+{
+	HANDLE hEvent = OpenEvent(EVENT_ALL_ACCESS, FALSE, EVENT_NAME_RESOURCE_BEGIN);
+	if (hEvent == NULL)
+		return 0;
+	ResourceLoadThreadArgs* args = (ResourceLoadThreadArgs*)lParam;
+
+	while (args->isFor)
+	{
 		WaitForSingleObject(hEvent, INFINITE);
 		ResetEvent(hEvent);
 
 		// レンダリング
-		threadArgs->renderer->Render();
-		
-		SetEvent(hEvent);
-		CloseHandle(hEvent);
+		args->manager->Load();
 	}
 
+	CloseHandle(hEvent);
 	return 0;
 }
 
@@ -96,6 +135,11 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 	WNDCLASS winc{};
 	MSG msg;
 
+	/***********************************************************
+	///
+	/// メインウィンドウ
+	///
+	************************************************************/
 	// ウィンドウクラス作成
 	winc.style = CS_HREDRAW | CS_VREDRAW;
 	winc.lpfnWndProc = WndProc;
@@ -117,6 +161,12 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 	);
 	if (hwnd == NULL) return 0;
 
+
+	/***********************************************************
+	///
+	/// 変数初期化
+	///
+	************************************************************/
 	// リソース
 	ResourceManager resourceManager = ResourceManager();
 	// キーステート
@@ -126,39 +176,74 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 	char fpsStr[100] = "";
 	// ステート管理
 	GameState state = STATE_TITLE;
+	GameState preState = STATE_TITLE;
 	// 画面
-	Title title = Title(&state, &keyStateManager);
-	Game game = Game(&state, &keyStateManager, &timer, &resourceManager);
-	Result result = Result(&state, &keyStateManager);
-	HighScore highScore = HighScore(&state, &keyStateManager);
+	Title title = Title(&state, &preState, &keyStateManager);
+	Game game = Game(&state, &preState, &keyStateManager, &timer, &resourceManager);
+	Result result = Result(&state, &preState, &keyStateManager);
+	HighScore highScore = HighScore(&state, &preState, &keyStateManager);
+	Loading loading = Loading(&state, &preState, &keyStateManager, &resourceManager);
 	// レンダラー
 	Renderer renderer = Renderer(hwnd, hInstance, &resourceManager);
-	// スレッド関連
-	HANDLE hThread;
-	DWORD dwThreadId;
-
 	// 背景pixelOffset用（スクロール）
 	int backgroundPixelOffset = 0;
 
-	//スレッド起動
-	ThreadArgs threadArgs = {true, &renderer};
-	hThread = CreateThread(
+
+	/***********************************************************
+	///
+	/// レンダースレッド
+	///
+	************************************************************/
+	DWORD dwRenderThreadId;
+	RenderThreadArgs renderThreadArgs = {true, &renderer};
+	HANDLE hRenderThread = CreateThread(
 		NULL, //セキュリティ属性
 		0, //スタックサイズ
-		ThreadFunc, //スレッド関数
-		(LPVOID)&threadArgs, //スレッド関数に渡す引数
+		RenderThreadFunc, //スレッド関数
+		(LPVOID)&renderThreadArgs, //スレッド関数に渡す引数
 		0, //作成オプション(0またはCREATE_SUSPENDED)
-		&dwThreadId//スレッドID
+		&dwRenderThreadId//スレッドID
 	);
-	if (hThread == NULL)
+	if (hRenderThread == NULL)
 		return 0;
 
-	// スレッド用イベント
-	HANDLE hEvent = CreateEvent(NULL, TRUE, FALSE, "event");
-	if (hEvent == NULL)
+	// レンダースレッド用イベント
+	HANDLE hRenderEventBegin = CreateEvent(NULL, TRUE, FALSE, EVENT_NAME_RENDER_BEGIN);
+	HANDLE hRenderEventEnd = CreateEvent(NULL, TRUE, FALSE, EVENT_NAME_RENDER_END);
+	if (hRenderEventBegin == NULL || hRenderEventEnd == NULL)
 		return 0;
 
-	// メッセージループ（WM_QUIT時のみループを抜ける）
+
+	/***********************************************************
+	///
+	/// リソースロードスレッド
+	///
+	************************************************************/
+	DWORD dwResourceLoadThreadId;
+	ResourceLoadThreadArgs resourceLoadThreadArgs = { true, &resourceManager };
+	HANDLE hResourceLoadThread = CreateThread(
+		NULL, //セキュリティ属性
+		0, //スタックサイズ
+		ResourceLoadThreadFunc, //スレッド関数
+		(LPVOID)&resourceLoadThreadArgs, //スレッド関数に渡す引数
+		0, //作成オプション(0またはCREATE_SUSPENDED)
+		&dwResourceLoadThreadId//スレッドID
+	);
+	if (hResourceLoadThread == NULL)
+		return 0;
+
+	// リソースロードスレッド用イベント
+	HANDLE hResourceLoadEventBegin = CreateEvent(NULL, TRUE, FALSE, EVENT_NAME_RESOURCE_BEGIN);
+	HANDLE hResourceLoadEventEnd = CreateEvent(NULL, TRUE, FALSE, EVENT_NAME_RESOURCE_END);
+	if (hResourceLoadEventBegin == NULL || hResourceLoadEventEnd == NULL)
+		return 0;
+
+
+	/***********************************************************
+	///
+	/// メインループ
+	///
+	************************************************************/
 	while (true)
 	{
 		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
@@ -178,8 +263,11 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 			// エスケープキー押下 or StateがQuit の場合に終了
 			if (KEYDOWN(VK_ESCAPE) || state == STATE_QUIT)
 			{
-				threadArgs.isFor = false;
+				renderThreadArgs.isFor = false;
+				resourceLoadThreadArgs.isFor = false;
+				SetEvent(hRenderEventEnd);
 				SendMessage(hwnd, WM_CLOSE, 0, 0);
+				continue;
 			}
 
 			// タイマーアップデート
@@ -188,7 +276,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 			// メイン処理
 			for (int i = 0; i < loop; i++)
 			{
-				SetEvent(hEvent);
+				SetEvent(hRenderEventBegin);
 
 				// キー入力アップデート
 				keyStateManager.update();
@@ -226,8 +314,14 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 					highScore.Update();
 					highScore.DrawRequest(renderer);
 				}
+				else if (state == STATE_LOADING)
+				{
+					loading.Update();
+					loading.DrawRequest(renderer);
+				}
 
-				WaitForSingleObject(hEvent, INFINITE);
+				WaitForSingleObject(hRenderEventEnd, INFINITE);
+				ResetEvent(hRenderEventEnd);
 				renderer.SwitchDrawInfoList();
 			}
 

@@ -27,17 +27,9 @@ Renderer::Renderer(HWND hwnd, HINSTANCE hInstance, ResourceManager* resourceMana
 	this->oldBMP = (HBITMAP)SelectObject(this->backHDC, this->backBMP);
 
 	// ‰æ‘œ“Ç‚İ‚İ
-	this->resourceManager->Load(RESOURCE_BACKGROUND, 0);
-	this->resourceManager->Load(RESOURCE_PLAYER, 0);
-	this->resourceManager->Load(RESOURCE_ENEMY, 0);
-	this->resourceManager->Load(RESOURCE_SHOT, 0);
-	this->resourceManager->Load(RESOURCE_SHOT, 1);
-	this->resourceManager->Load(RESOURCE_EXPLOSION, 0);
-	this->resourceManager->Load(RESOURCE_EXPLOSION, 1);
-	this->resourceManager->Load(RESOURCE_EXPLOSION, 2);
-	this->resourceManager->Load(RESOURCE_EXPLOSION, 3);
-	this->resourceManager->Load(RESOURCE_EXPLOSION, 4);
-	this->resourceManager->Load(RESOURCE_EXPLOSION, 5);
+	this->resourceManager->LoadRequest(RESOURCE_BACKGROUND, 0);
+
+	this->resourceManager->Load();
 }
 
 Renderer::~Renderer()

@@ -1,10 +1,11 @@
 #include "HighScore.h"
 
 
-HighScore::HighScore(GameState* state, KeyStateManager* keyStateManager)
+HighScore::HighScore(GameState* state, GameState* preState, KeyStateManager* keyStateManager)
 {
 	this->keyStateManager = keyStateManager;
 	this->state = state;
+	this->preState = preState;
 }
 
 HighScore::~HighScore()
@@ -14,6 +15,7 @@ HighScore::~HighScore()
 void HighScore::Update()
 {
 	if (this->keyStateManager->getKeyState(VK_RETURN)->getIsDownStart()) {
+		*(this->preState) = *(this->state);
 		*(this->state) = STATE_TITLE;
 	}
 }

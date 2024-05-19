@@ -157,6 +157,7 @@
     <ClCompile Include="src\KeyStateManager.cpp" />
     <ClCompile Include="src\MenuManager.cpp" />
     <ClCompile Include="src\Constants.h" />
+    <ClCompile Include="src\gameScene\scenes\Loading.cpp" />
     <ClCompile Include="src\WinMain.cpp" />
     <ClCompile Include="src\Timer.cpp" />
     <ClCompile Include="src\gameScene\scenes\Title.cpp" />
@@ -196,6 +197,7 @@
     <ClInclude Include="src\MenuManager.h" />
     <ClInclude Include="src\Timer.h" />
     <ClInclude Include="src\gameScene\scenes\Title.h" />
+    <ClInclude Include="src\gameScene\scenes\Loading.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

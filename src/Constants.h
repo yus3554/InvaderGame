@@ -42,19 +42,36 @@ constexpr POINT WND_SIZE = { 720, 480 };
 constexpr PCTSTR UI_TEXT_TITLE = TEXT("Invader Game");
 
 /// <summary>
-/// UI メニューアイテム ゲームスタート
+/// UI ゲームスタート
 /// </summary>
 constexpr PCTSTR UI_TEXT_START = TEXT("Start");
 
 /// <summary>
-/// UI メニューアイテム ハイスコア
+/// UI ハイスコア
 /// </summary>
 constexpr PCTSTR UI_TEXT_HIGHSCORE = TEXT("High Score");
 
 /// <summary>
-/// UI メニューアイテム 終了
+/// UI 終了
 /// </summary>
 constexpr PCTSTR UI_TEXT_QUIT = TEXT("Quit");
+
+/// <summary>
+/// UI ローディング
+/// </summary>
+constexpr PCTSTR UI_TEXT_LOADING = TEXT("Now Loading");
+
+/// <summary>
+/// Eventネーム レンダースレッド用
+/// </summary>
+constexpr PCTSTR EVENT_NAME_RENDER_BEGIN = TEXT("RENDER_EVENT_BEGIN");
+constexpr PCTSTR EVENT_NAME_RENDER_END = TEXT("RENDER_EVENT_END");
+
+/// <summary>
+/// Eventネーム リソースロードスレッド用
+/// </summary>
+constexpr PCTSTR EVENT_NAME_RESOURCE_BEGIN = TEXT("RESOURCE_EVENT_BEGIN");
+constexpr PCTSTR EVENT_NAME_RESOURCE_END = TEXT("RESOURCE_EVENT_END");
 
 /// <summary>
 /// プレイヤーの初期位置
@@ -113,6 +130,11 @@ enum GameState
 	/// 終了
 	/// </summary>
 	STATE_QUIT,
+
+	/// <summary>
+	/// ローディング画面
+	/// </summary>
+	STATE_LOADING,
 
 	/// <summary>
 	/// ステート数

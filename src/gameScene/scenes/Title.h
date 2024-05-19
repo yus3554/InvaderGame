@@ -13,7 +13,7 @@ private:
     MenuManager* menuManager;
 
 public:
-    Title(GameState* state, KeyStateManager* keyStateManager);
+    Title(GameState* state, GameState* preState, KeyStateManager* keyStateManager);
     ~Title();
     void DrawRequest(Renderer& renderer);
     void Update();

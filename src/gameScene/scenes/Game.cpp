@@ -1,11 +1,12 @@
 #include "Game.h"
 
-Game::Game(GameState* state, KeyStateManager* keyStateManager, Timer* timer, ResourceManager* resourceManager)
+Game::Game(GameState* state, GameState* preState, KeyStateManager* keyStateManager, Timer* timer, ResourceManager* resourceManager)
 {
 	this->resourceManager = resourceManager;
 	this->isNeedInit = true;
 	this->keyStateManager = keyStateManager;
 	this->state = state;
+	this->preState = preState;
 	this->timer = timer;
 	this->innerState = PLAY;
 	this->playerDeathFrame = 0;
@@ -34,7 +35,10 @@ void Game::Update()
 	// 初期化
 	if (this->isNeedInit)
 	{
-		this->GameInitialize();
+		if (*(this->preState) != STATE_LOADING) {
+			this->GameInitialize();
+			return;
+		}
 		this->isNeedInit = false;
 	}
 	
@@ -114,15 +118,13 @@ void Game::DrawRequest(Renderer& renderer)
 	if (this->innerState == PRE_GAMEOVER)
 	{
 		if (this->playerExplosionResourceIndex < 6)
+		{
 			// TODO: エフェクト画像のサイズとプレイヤーの画像サイズが異なるため、左上を原点にすると位置がずれてしまう。そのため-16している
 			// TODO: が、もちろんこんなハードコーディングは良くない
-			renderer.DrawRequestImage(
-				{
-					this->player->getPos().x - 16,
-					this->player->getPos().y - 16
-				},
-				this->resourceManager->GetResourceData(RESOURCE_EXPLOSION, this->playerExplosionResourceIndex), 0
-			);
+			ResourceData* data = this->resourceManager->GetResourceData(RESOURCE_EXPLOSION, this->playerExplosionResourceIndex);
+			renderer.DrawRequestImage({this->player->getPos().x - 16, this->player->getPos().y - 16}, data, 0);
+		}
+			
 	}
 }
 
@@ -167,6 +169,22 @@ void Game::GameInitialize()
 	this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
 	enemyPos.x += 50;
 	this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
+
+
+	this->resourceManager->LoadRequest(RESOURCE_PLAYER, 0);
+	this->resourceManager->LoadRequest(RESOURCE_ENEMY, 0);
+	this->resourceManager->LoadRequest(RESOURCE_SHOT, 0);
+	this->resourceManager->LoadRequest(RESOURCE_SHOT, 1);
+	this->resourceManager->LoadRequest(RESOURCE_EXPLOSION, 0);
+	this->resourceManager->LoadRequest(RESOURCE_EXPLOSION, 1);
+	this->resourceManager->LoadRequest(RESOURCE_EXPLOSION, 2);
+	this->resourceManager->LoadRequest(RESOURCE_EXPLOSION, 3);
+	this->resourceManager->LoadRequest(RESOURCE_EXPLOSION, 4);
+	this->resourceManager->LoadRequest(RESOURCE_EXPLOSION, 5);
+
+	// Loading
+	*(this->preState) = STATE_GAME;
+	*(this->state) = STATE_LOADING;
 }
 
 void Game::GameFinalize()
@@ -184,6 +202,7 @@ void Game::GameFinalize()
 	this->innerState = PLAY;
 
 	// ステートを変更
+	*(this->preState) = *(this->state);
 	*(this->state) = STATE_RESULT;
 }
 

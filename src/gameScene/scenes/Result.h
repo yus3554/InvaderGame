@@ -8,7 +8,7 @@ class Result :
 private:
 
 public:
-    Result(GameState* state, KeyStateManager* keyStateManager);
+    Result(GameState* state, GameState* preState, KeyStateManager* keyStateManager);
     ~Result();
     void DrawRequest(Renderer& renderer);
     void Update();

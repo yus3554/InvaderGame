@@ -8,7 +8,7 @@ class HighScore :
 private:
 
 public:
-    HighScore(GameState* state, KeyStateManager* keyStateManager);
+    HighScore(GameState* state, GameState* preState, KeyStateManager* keyStateManager);
     ~HighScore();
     void DrawRequest(Renderer& renderer);
     void Update();

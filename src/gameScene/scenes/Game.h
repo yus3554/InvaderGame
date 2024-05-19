@@ -30,7 +30,7 @@ private:
     int playerDeathFrame;
     int playerExplosionResourceIndex;
 public:
-    Game(GameState* state, KeyStateManager* keyStateManager, Timer* timer, ResourceManager* resourceManager);
+    Game(GameState* state, GameState* preState, KeyStateManager* keyStateManager, Timer* timer, ResourceManager* resourceManager);
     ~Game();
     void DrawRequest(Renderer& renderer);
     void Update();

@@ -1,76 +1,36 @@
 #include "ResourceManager.h"
 
-ResourceData::ResourceData(int resourceIndex, int width, int height, LPDWORD pixelBits)
+ResourceDataInfo::ResourceDataInfo(ResourceType type, int resourceIndex, bool force)
 {
+	this->type = type;
 	this->resourceIndex = resourceIndex;
-	this->width = width;
-	this->height = height;
-	this->pixelBits = pixelBits;
+	this->force = force;
 }
 
-ResourceData::~ResourceData()
+ResourceData* ResourceDataInfo::Load()
 {
-	free(pixelBits);
-}
-
-ResourceManager::ResourceManager()
-{
-	this->backgroundsResourceList = new LinkedList<ResourceData>();
-	this->playersResourceList = new LinkedList<ResourceData>();
-	this->explosionsResourceList = new LinkedList<ResourceData>();
-	this->enemiesResourceList = new LinkedList<ResourceData>();
-	this->shotsResourceList = new LinkedList<ResourceData>();
-}
-
-ResourceManager::~ResourceManager()
-{
-	delete this->backgroundsResourceList;
-	delete this->playersResourceList;
-	delete this->explosionsResourceList;
-	delete this->enemiesResourceList;
-	delete this->shotsResourceList;
-}
-
-void ResourceManager::Load(ResourceType type, int resourceIndex)
-{
-	LinkedList<ResourceData>* list;
 	char filepath[120] = "";
 	strcpy_s(filepath, RESOURCE_ROOT_FOLDERPATH);
 	switch (type)
 	{
 	case RESOURCE_BACKGROUND:
-		list = this->backgroundsResourceList;
 		strcat_s(filepath, BACKGROUND_FILEPATHS[resourceIndex]);
 		break;
 	case RESOURCE_PLAYER:
-		list = this->playersResourceList;
 		strcat_s(filepath, PLAYER_FILEPATHS[resourceIndex]);
 		break;
 	case RESOURCE_EXPLOSION:
-		list = this->explosionsResourceList;
 		strcat_s(filepath, EXPLOSION_FILEPATHS[resourceIndex]);
 		break;
 	case RESOURCE_ENEMY:
-		list = this->enemiesResourceList;
 		strcat_s(filepath, ENEMY_FILEPATHS[resourceIndex]);
 		break;
 	case RESOURCE_SHOT:
-		list = this->shotsResourceList;
 		strcat_s(filepath, SHOT_FILEPATHS[resourceIndex]);
 		break;
 	default:
 		throw "illegal ResourceType.";
 		break;
-	}
-	
-	// すでに同じresourceIndexのデータが入っている場合は、それを削除する
-	for (int i = 0; i < list->getLength(); i++)
-	{
-		if (list->get(i)->resourceIndex == resourceIndex)
-		{
-			list->remove(i);
-			break;
-		}
 	}
 
 	// ロード
@@ -89,7 +49,7 @@ void ResourceManager::Load(ResourceType type, int resourceIndex)
 	fread_s(&width, sizeof(width), sizeof(width), 1, file);
 	fread_s(&height, sizeof(height), sizeof(height), 1, file);
 
-	LPDWORD pixelBits = (LPDWORD)malloc(sizeof(DWORD)* width * height);
+	LPDWORD pixelBits = (LPDWORD)malloc(sizeof(DWORD) * width * height);
 
 	fseek(file, offBits, SEEK_SET);
 	BYTE blue;
@@ -109,8 +69,8 @@ void ResourceManager::Load(ResourceType type, int resourceIndex)
 			else
 				alpha = 0xff;
 
-			pixelBits[i * width + j] = 
-				0x00000000 | 
+			pixelBits[i * width + j] =
+				0x00000000 |
 				((DWORD)alpha << 24) |
 				((DWORD)red << 16) |
 				((DWORD)green << 8) |
@@ -120,7 +80,124 @@ void ResourceManager::Load(ResourceType type, int resourceIndex)
 	fclose(file);
 
 	ResourceData* data = new ResourceData(resourceIndex, width, height, pixelBits);
-	list->add(data);
+	return data;
+}
+
+ResourceType ResourceDataInfo::GetType()
+{
+	return this->type;
+}
+
+int ResourceDataInfo::GetIndex()
+{
+	return this->resourceIndex;
+}
+
+bool ResourceDataInfo::GetForce()
+{
+	return this->force;
+}
+
+ResourceData::ResourceData(int resourceIndex, int width, int height, LPDWORD pixelBits)
+{
+	this->resourceIndex = resourceIndex;
+	this->width = width;
+	this->height = height;
+	this->pixelBits = pixelBits;
+}
+
+ResourceData::~ResourceData()
+{
+	free(pixelBits);
+}
+
+ResourceManager::ResourceManager()
+{
+	this->resourceInfoList = new LinkedList<ResourceDataInfo>();
+	this->backgroundsResourceList = new LinkedList<ResourceData>();
+	this->playersResourceList = new LinkedList<ResourceData>();
+	this->explosionsResourceList = new LinkedList<ResourceData>();
+	this->enemiesResourceList = new LinkedList<ResourceData>();
+	this->shotsResourceList = new LinkedList<ResourceData>();
+	this->isCompletedLoad = true;
+}
+
+ResourceManager::~ResourceManager()
+{
+	delete this->resourceInfoList;
+	delete this->backgroundsResourceList;
+	delete this->playersResourceList;
+	delete this->explosionsResourceList;
+	delete this->enemiesResourceList;
+	delete this->shotsResourceList;
+}
+
+void ResourceManager::LoadRequest(ResourceType type, int resourceIndex, bool force)
+{
+	this->isCompletedLoad = false;
+	auto info = new ResourceDataInfo(type, resourceIndex, force);
+	this->resourceInfoList->add(info);
+}
+
+void ResourceManager::Load()
+{
+	ResourceDataInfo* info;
+	ResourceData* data;
+	LinkedList<ResourceData>* list;
+
+	for (int i = 0; i < this->resourceInfoList->getLength(); i++)
+	{
+		bool isLoaded = false;
+
+		info = this->resourceInfoList->pop();
+		switch (info->GetType())
+		{
+		case RESOURCE_BACKGROUND:
+			list = this->backgroundsResourceList;
+			break;
+		case RESOURCE_PLAYER:
+			list = this->playersResourceList;
+			break;
+		case RESOURCE_ENEMY:
+			list = this->enemiesResourceList;
+			break;
+		case RESOURCE_SHOT:
+			list = this->shotsResourceList;
+			break;
+		case RESOURCE_EXPLOSION:
+			list = this->explosionsResourceList;
+			break;
+		default:
+			throw "illegal ResourceType.";
+			break;
+		}
+
+		// すでに同じresourceIndexのデータが入っている場合は、それを削除する
+		for (int j = 0; j < list->getLength(); j++)
+		{
+			if (list->get(j)->resourceIndex == info->GetIndex())
+			{
+				if (info->GetForce())
+					list->remove(j);
+				isLoaded = true;
+				break;
+			}
+		}
+
+		// ロード（forceがtrue または isLoadedがfalse）
+		if (info->GetForce() || !isLoaded)
+		{
+			data = info->Load();
+
+			// 格納
+			list->add(data);
+		}
+		delete info;
+		i--;
+	}
+
+	Sleep(2000);
+	this->isCompletedLoad = true;
 }
 
 void ResourceManager::Clear(ResourceType type, int resourceIndex)
@@ -139,6 +216,9 @@ void ResourceManager::Clear(ResourceType type, int resourceIndex)
 		break;
 	case RESOURCE_SHOT:
 		list = this->shotsResourceList;
+		break;
+	case RESOURCE_EXPLOSION:
+		list = this->explosionsResourceList;
 		break;
 	default:
 		throw "illegal ResourceType.";
@@ -188,4 +268,9 @@ ResourceData* ResourceManager::GetResourceData(ResourceType type, int resourceIn
 		}
 	}
 	return NULL;
+}
+
+bool ResourceManager::GetIsCompletedLoad()
+{
+	return this->isCompletedLoad;
 }

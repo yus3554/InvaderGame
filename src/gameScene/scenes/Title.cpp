@@ -1,10 +1,11 @@
 #include "Title.h"
 
-Title::Title(GameState* state, KeyStateManager* keyStateManager)
+Title::Title(GameState* state, GameState* preState, KeyStateManager* keyStateManager)
 {
 	this->keyStateManager = keyStateManager;
 	this->menuManager = new MenuManager();
 	this->state = state;
+	this->preState = preState;
 }
 
 Title::~Title()
@@ -41,6 +42,7 @@ void Title::Update()
 			break;
 		}
 
+		*(this->preState) = *(this->state);
 		*(this->state) = state;
 	}
 }

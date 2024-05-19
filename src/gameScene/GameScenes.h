@@ -4,3 +4,4 @@
 #include "./scenes/Game.h"
 #include "./scenes/Result.h"
 #include "./scenes/HighScore.h"
+#include "./scenes/Loading.h"

@@ -16,6 +16,7 @@ protected:
     /// ステート
     /// </summary>
     GameState* state;
+    GameState* preState;
 public:
     GameScene();
     virtual void Update() = 0;
