@@ -111,7 +111,7 @@ ResourceData::~ResourceData()
 	free(pixelBits);
 }
 
-ResourceManager::ResourceManager()
+ResourceManager::ResourceManager(CRITICAL_SECTION* cs)
 {
 	this->resourceInfoList = new LinkedList<ResourceDataInfo>();
 	this->backgroundsResourceList = new LinkedList<ResourceData>();
@@ -119,7 +119,16 @@ ResourceManager::ResourceManager()
 	this->explosionsResourceList = new LinkedList<ResourceData>();
 	this->enemiesResourceList = new LinkedList<ResourceData>();
 	this->shotsResourceList = new LinkedList<ResourceData>();
-	this->isCompletedLoad = true;
+	this->isLoading = false;
+	this->cs = cs;
+
+	// リソースロードスレッド用イベント
+	this->hResourceEvent = OpenEvent(EVENT_ALL_ACCESS, FALSE, EVENT_NAME_RESOURCE_BEGIN);
+	if (this->hResourceEvent == NULL)
+	{
+		throw "RESOURCE_LOAD_EVENT is NULL.";
+		return;
+	}
 }
 
 ResourceManager::~ResourceManager()
@@ -130,74 +139,93 @@ ResourceManager::~ResourceManager()
 	delete this->explosionsResourceList;
 	delete this->enemiesResourceList;
 	delete this->shotsResourceList;
+	CloseHandle(this->hResourceEvent);
 }
 
 void ResourceManager::LoadRequest(ResourceType type, int resourceIndex, bool force)
 {
-	this->isCompletedLoad = false;
 	auto info = new ResourceDataInfo(type, resourceIndex, force);
+	EnterCriticalSection(this->cs);
 	this->resourceInfoList->add(info);
+	LeaveCriticalSection(this->cs);
+	SetEvent(this->hResourceEvent);
 }
 
-void ResourceManager::Load()
+
+/// <summary>
+/// 一枚だけロードする
+/// </summary>
+void ResourceManager::LoadOnce()
 {
 	ResourceDataInfo* info;
 	ResourceData* data;
 	LinkedList<ResourceData>* list;
 
-	for (int i = 0; i < this->resourceInfoList->getLength(); i++)
+	// listからinfo取得
+	EnterCriticalSection(this->cs);
+	this->isLoading = true;
+	info = this->resourceInfoList->pop();
+	LeaveCriticalSection(this->cs);
+
+	if (info == NULL)
 	{
-		bool isLoaded = false;
-
-		info = this->resourceInfoList->pop();
-		switch (info->GetType())
-		{
-		case RESOURCE_BACKGROUND:
-			list = this->backgroundsResourceList;
-			break;
-		case RESOURCE_PLAYER:
-			list = this->playersResourceList;
-			break;
-		case RESOURCE_ENEMY:
-			list = this->enemiesResourceList;
-			break;
-		case RESOURCE_SHOT:
-			list = this->shotsResourceList;
-			break;
-		case RESOURCE_EXPLOSION:
-			list = this->explosionsResourceList;
-			break;
-		default:
-			throw "illegal ResourceType.";
-			break;
-		}
-
-		// すでに同じresourceIndexのデータが入っている場合は、それを削除する
-		for (int j = 0; j < list->getLength(); j++)
-		{
-			if (list->get(j)->resourceIndex == info->GetIndex())
-			{
-				if (info->GetForce())
-					list->remove(j);
-				isLoaded = true;
-				break;
-			}
-		}
-
-		// ロード（forceがtrue または isLoadedがfalse）
-		if (info->GetForce() || !isLoaded)
-		{
-			data = info->Load();
-
-			// 格納
-			list->add(data);
-		}
-		delete info;
-		i--;
+		this->isLoading = false;
+		return;
 	}
 
-	Sleep(2000);
-	this->isCompletedLoad = true;
+	// ロードしたものを格納するリストを取得
+	switch (info->GetType())
+	{
+	case RESOURCE_BACKGROUND:
+		list = this->backgroundsResourceList;
+		break;
+	case RESOURCE_PLAYER:
+		list = this->playersResourceList;
+		break;
+	case RESOURCE_ENEMY:
+		list = this->enemiesResourceList;
+		break;
+	case RESOURCE_SHOT:
+		list = this->shotsResourceList;
+		break;
+	case RESOURCE_EXPLOSION:
+		list = this->explosionsResourceList;
+		break;
+	default:
+		throw "illegal ResourceType.";
+		break;
+	}
+
+	bool isLoaded = false;
+
+	// すでに同じresourceIndexのデータが入っている場合は、それを削除する
+	for (int j = 0; j < list->getLength(); j++)
+	{
+		if (list->get(j)->resourceIndex == info->GetIndex())
+		{
+			if (info->GetForce())
+				list->remove(j);
+			isLoaded = true;
+			break;
+		}
+	}
+
+	// ロード（forceがtrue または isLoadedがfalse）
+	if (info->GetForce() || !isLoaded)
+	{
+		data = info->Load();
+
+		// 格納
+		list->add(data);
+	}
+	delete info;
+	this->isLoading = false;
+
+	// ロード完了状態ならリソースロードスレッドを停止させる
+	if (this->GetIsCompletedLoad())
+	{
+		ResetEvent(this->hResourceEvent);
+	}
 }
 
 void ResourceManager::Clear(ResourceType type, int resourceIndex)
@@ -272,5 +300,11 @@ ResourceData* ResourceManager::GetResourceData(ResourceType type, int resourceIn
 
 bool ResourceManager::GetIsCompletedLoad()
 {
-	return this->isCompletedLoad;
+	// リストが空かどうか
+	EnterCriticalSection(this->cs);
+	bool isZeroLengthList = (this->resourceInfoList->getLength() == 0) ? true : false;
+	LeaveCriticalSection(this->cs);
+
+	// リストが空 かつ ロード中ではないときにtrue
+	return isZeroLengthList && !this->isLoading;
 }

@@ -40,11 +40,14 @@ private:
 	LinkedList<ResourceData>* explosionsResourceList;
 	LinkedList<ResourceData>* enemiesResourceList;
 	LinkedList<ResourceData>* shotsResourceList;
-	bool isCompletedLoad;
+	bool isLoading;
+	CRITICAL_SECTION* cs;
+	HANDLE hResourceEvent;
+
 public:
-	ResourceManager();
+	ResourceManager(CRITICAL_SECTION* cs);
 	~ResourceManager();
-	void Load();
+	void LoadOnce();
 	void LoadRequest(ResourceType type, int resourceIndex, bool force = false);
 	void Clear(ResourceType type, int resourceIndex);
 	ResourceData* GetResourceData(ResourceType type, int resourceIndex);

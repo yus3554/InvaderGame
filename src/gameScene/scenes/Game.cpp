@@ -35,11 +35,10 @@ void Game::Update()
 	// 初期化
 	if (this->isNeedInit)
 	{
-		if (*(this->preState) != STATE_LOADING) {
-			this->GameInitialize();
-			return;
-		}
+		this->GameInitialize();
 		this->isNeedInit = false;
+		if (*(this->state) == STATE_LOADING)
+			return;
 	}
 	
 	// プレイヤーのupdate
@@ -182,9 +181,12 @@ void Game::GameInitialize()
 	this->resourceManager->LoadRequest(RESOURCE_EXPLOSION, 4);
 	this->resourceManager->LoadRequest(RESOURCE_EXPLOSION, 5);
 
-	// Loading
-	*(this->preState) = STATE_GAME;
-	*(this->state) = STATE_LOADING;
+	// Loading（ロードが完了していなければ）
+	if (!this->resourceManager->GetIsCompletedLoad())
+	{
+		*(this->preState) = STATE_GAME;
+		*(this->state) = STATE_LOADING;
+	}
 }
 
 void Game::GameFinalize()

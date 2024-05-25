@@ -27,7 +27,8 @@ int Timer::getDiffFrame()
 
 	// 現在のフレームのほうがbeforeフレームより大きくなった場合に、その差分をloopにいれる
 	if (this->nowFrame > beforeFrame) {
-		loop = this->nowFrame - beforeFrame;
+		// loop = this->nowFrame - beforeFrame;
+		loop = 1;
 
 		// realFPS計算
 		diffTime = (double)(nowCount.QuadPart - this->beforeCount.QuadPart) / cpuFreq.QuadPart;

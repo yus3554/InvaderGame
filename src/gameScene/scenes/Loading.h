@@ -9,7 +9,7 @@ class Loading :
 {
 private:
     ResourceManager* resourceManager;
-    bool isNeedInit;
+    HANDLE hResourceEvent;
 
 public:
     Loading(GameState* state, GameState* preState, KeyStateManager* keyStateManager, ResourceManager* resourceManager);

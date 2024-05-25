@@ -29,7 +29,7 @@ Renderer::Renderer(HWND hwnd, HINSTANCE hInstance, ResourceManager* resourceMana
 	// ‰æ‘œ“Ç‚Ýž‚Ý
 	this->resourceManager->LoadRequest(RESOURCE_BACKGROUND, 0);
 
-	this->resourceManager->Load();
+	this->resourceManager->LoadOnce();
 }
 
 Renderer::~Renderer()

@@ -23,15 +23,17 @@ RenderThreadArgs::RenderThreadArgs(bool isFor, Renderer* renderer)
 
 struct ResourceLoadThreadArgs
 {
-	ResourceLoadThreadArgs(bool isFor, ResourceManager* manager);
+	ResourceLoadThreadArgs(bool isFor, ResourceManager* manager, CRITICAL_SECTION* cs);
 	bool isFor;
 	ResourceManager* manager;
+	CRITICAL_SECTION* cs;
 };
 
-ResourceLoadThreadArgs::ResourceLoadThreadArgs(bool isFor, ResourceManager* manager)
+ResourceLoadThreadArgs::ResourceLoadThreadArgs(bool isFor, ResourceManager* manager, CRITICAL_SECTION* cs)
 {
 	this->isFor = isFor;
 	this->manager = manager;
+	this->cs = cs;
 }
 
 /// <summary>
@@ -110,10 +112,10 @@ DWORD WINAPI ResourceLoadThreadFunc(LPVOID lParam)
 	while (args->isFor)
 	{
 		WaitForSingleObject(hEvent, INFINITE);
-		ResetEvent(hEvent);
+		OutputDebugString("a\n");
 
-		// レンダリング
-		args->manager->Load();
+		// 画像１枚ロード
+		args->manager->LoadOnce();
 	}
 
 	CloseHandle(hEvent);
@@ -167,8 +169,22 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 	/// 変数初期化
 	///
 	************************************************************/
+	// レンダースレッド用イベント
+	HANDLE hRenderEventBegin = CreateEvent(NULL, TRUE, FALSE, EVENT_NAME_RENDER_BEGIN);
+	HANDLE hRenderEventEnd = CreateEvent(NULL, TRUE, FALSE, EVENT_NAME_RENDER_END);
+	if (hRenderEventBegin == NULL || hRenderEventEnd == NULL)
+		return 0;
+	// リソースロードスレッド用イベント
+	HANDLE hResourceLoadEventBegin = CreateEvent(NULL, TRUE, FALSE, EVENT_NAME_RESOURCE_BEGIN);
+	HANDLE hResourceLoadEventEnd = CreateEvent(NULL, TRUE, FALSE, EVENT_NAME_RESOURCE_END);
+	if (hResourceLoadEventBegin == NULL || hResourceLoadEventEnd == NULL)
+		return 0;
+
+	// リソースリロード用クリティカルセクション
+	CRITICAL_SECTION cs;
+	InitializeCriticalSection(&cs);
 	// リソース
-	ResourceManager resourceManager = ResourceManager();
+	ResourceManager resourceManager = ResourceManager(&cs);
 	// キーステート
 	KeyStateManager keyStateManager = KeyStateManager();
 	// タイマー
@@ -207,12 +223,6 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 	if (hRenderThread == NULL)
 		return 0;
 
-	// レンダースレッド用イベント
-	HANDLE hRenderEventBegin = CreateEvent(NULL, TRUE, FALSE, EVENT_NAME_RENDER_BEGIN);
-	HANDLE hRenderEventEnd = CreateEvent(NULL, TRUE, FALSE, EVENT_NAME_RENDER_END);
-	if (hRenderEventBegin == NULL || hRenderEventEnd == NULL)
-		return 0;
-
 
 	/***********************************************************
 	///
@@ -220,7 +230,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 	///
 	************************************************************/
 	DWORD dwResourceLoadThreadId;
-	ResourceLoadThreadArgs resourceLoadThreadArgs = { true, &resourceManager };
+	ResourceLoadThreadArgs resourceLoadThreadArgs = { true, &resourceManager, &cs};
 	HANDLE hResourceLoadThread = CreateThread(
 		NULL, //セキュリティ属性
 		0, //スタックサイズ
@@ -230,12 +240,6 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 		&dwResourceLoadThreadId//スレッドID
 	);
 	if (hResourceLoadThread == NULL)
-		return 0;
-
-	// リソースロードスレッド用イベント
-	HANDLE hResourceLoadEventBegin = CreateEvent(NULL, TRUE, FALSE, EVENT_NAME_RESOURCE_BEGIN);
-	HANDLE hResourceLoadEventEnd = CreateEvent(NULL, TRUE, FALSE, EVENT_NAME_RESOURCE_END);
-	if (hResourceLoadEventBegin == NULL || hResourceLoadEventEnd == NULL)
 		return 0;
 
 
