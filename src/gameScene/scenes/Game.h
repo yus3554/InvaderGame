@@ -6,6 +6,7 @@
 #include "../../gameActor/manager/ShotManager.h"
 #include "../../Timer.h"
 #include "../../ResourceManager.h"
+#include "../../Constants.h"
 #include <stdio.h>
 
 enum InnerState
@@ -21,6 +22,7 @@ class Game :
 {
 private:
     ResourceManager* resourceManager;
+    GameDifficultyState* difficultyState;
     bool isNeedInit;
     PlayerBase* player;
     EnemyManager* enemyManager;
@@ -30,7 +32,7 @@ private:
     int playerDeathFrame;
     int playerExplosionResourceIndex;
 public:
-    Game(GameState* state, GameState* preState, KeyStateManager* keyStateManager, Timer* timer, ResourceManager* resourceManager);
+    Game(GameState* state, GameState* preState, KeyStateManager* keyStateManager, Timer* timer, ResourceManager* resourceManager, GameDifficultyState* difficultyState);
     ~Game();
     void DrawRequest(Renderer& renderer);
     void Update();

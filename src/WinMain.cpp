@@ -188,14 +188,15 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 	// キーステート
 	KeyStateManager keyStateManager = KeyStateManager();
 	// タイマー
-	Timer timer = Timer(FPS);
+	Timer timer = Timer(60);
 	char fpsStr[100] = "";
 	// ステート管理
 	GameState state = STATE_TITLE;
 	GameState preState = STATE_TITLE;
+	GameDifficultyState difficultyState = DIFFICULTY_STATE_NORMAL;
 	// 画面
-	Title title = Title(&state, &preState, &keyStateManager);
-	Game game = Game(&state, &preState, &keyStateManager, &timer, &resourceManager);
+	Title title = Title(&state, &preState, &keyStateManager, &timer, &difficultyState);
+	Game game = Game(&state, &preState, &keyStateManager, &timer, &resourceManager, &difficultyState);
 	Result result = Result(&state, &preState, &keyStateManager);
 	HighScore highScore = HighScore(&state, &preState, &keyStateManager);
 	Loading loading = Loading(&state, &preState, &keyStateManager, &resourceManager);

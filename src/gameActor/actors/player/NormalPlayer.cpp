@@ -9,12 +9,12 @@ void NormalPlayer::Update()
 {
 	if (this->keyStateManager->getKeyState(VK_LEFT)->getIsDownCurrent())
 	{
-		this->pos.x -= (FLOAT)(this->speed * 60.0 / this->timer->getRealFPS());
+		this->pos.x -= this->GetAdjustSpeed();
 	}
 	
 	if (this->keyStateManager->getKeyState(VK_RIGHT)->getIsDownCurrent())
 	{
-		this->pos.x += (FLOAT)(this->speed * 60.0 / this->timer->getRealFPS());
+		this->pos.x += this->GetAdjustSpeed();
 	}
 
 	if (this->keyStateManager->getKeyState(VK_SPACE)->getIsDownStart())

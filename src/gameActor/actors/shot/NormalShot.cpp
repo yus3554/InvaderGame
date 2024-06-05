@@ -9,10 +9,10 @@ void NormalShot::Update()
 {
 	if (this->isPlayerShot)
 	{
-		this->pos.y -= (FLOAT)(this->speed * 60.0 / this->timer->getRealFPS());
+		this->pos.y -= this->GetAdjustSpeed();
 	}
 	else
 	{
-		this->pos.y += (FLOAT)(this->speed * 60.0 / this->timer->getRealFPS());
+		this->pos.y += this->GetAdjustSpeed();
 	}
 }

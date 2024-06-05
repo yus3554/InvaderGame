@@ -1,6 +1,6 @@
 #include "Game.h"
 
-Game::Game(GameState* state, GameState* preState, KeyStateManager* keyStateManager, Timer* timer, ResourceManager* resourceManager)
+Game::Game(GameState* state, GameState* preState, KeyStateManager* keyStateManager, Timer* timer, ResourceManager* resourceManager, GameDifficultyState* difficultyState)
 {
 	this->resourceManager = resourceManager;
 	this->isNeedInit = true;
@@ -8,6 +8,7 @@ Game::Game(GameState* state, GameState* preState, KeyStateManager* keyStateManag
 	this->state = state;
 	this->preState = preState;
 	this->timer = timer;
+	this->difficultyState = difficultyState;
 	this->innerState = PLAY;
 	this->playerDeathFrame = 0;
 	this->playerExplosionResourceIndex = 0;
@@ -134,40 +135,81 @@ void Game::GameInitialize()
 
 	// “G‚Ì‰Šú‰»
 	POINTFLOAT enemyPos = { 20.0, 50.0 };
-	this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
-	enemyPos.x += 50;
-	this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
-	enemyPos.x += 50;
-	this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
-	enemyPos.x += 50;
-	this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
-	enemyPos.x += 50;
-	this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
-	enemyPos.x += 50;
-	this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
-	enemyPos.x += 50;
-	this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
-	enemyPos.x += 50;
-	this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
-	enemyPos.x += 50;
-	this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
-	enemyPos.y += 40;
-	enemyPos.x = 20.0;
-	this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
-	enemyPos.x += 50;
-	this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
-	enemyPos.x += 50;
-	this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
-	enemyPos.x += 50;
-	this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
-	enemyPos.x += 50;
-	this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
-	enemyPos.x += 50;
-	this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
-	enemyPos.x += 50;
-	this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
-	enemyPos.x += 50;
-	this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
+
+	if (*this->difficultyState != DIFFICULTY_STATE_HARD) {
+		this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
+		enemyPos.x += 50;
+		this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
+		enemyPos.x += 50;
+		this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
+		enemyPos.x += 50;
+		this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
+		enemyPos.x += 50;
+		this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
+		enemyPos.x += 50;
+		this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
+		enemyPos.x += 50;
+		this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
+		enemyPos.x += 50;
+		this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
+		enemyPos.x += 50;
+		this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
+		enemyPos.y += 40;
+		enemyPos.x = 20.0;
+		this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
+		enemyPos.x += 50;
+		this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
+		enemyPos.x += 50;
+		this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
+		enemyPos.x += 50;
+		this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
+		enemyPos.x += 50;
+		this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
+		enemyPos.x += 50;
+		this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
+		enemyPos.x += 50;
+		this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
+		enemyPos.x += 50;
+		this->enemyManager->CreateEnemy<NormalEnemy>(enemyPos, 200);
+	}
+	else
+	{
+		this->enemyManager->CreateEnemy<HyperEnemy>(enemyPos, 200);
+		enemyPos.x += 50;
+		this->enemyManager->CreateEnemy<HyperEnemy>(enemyPos, 200);
+		enemyPos.x += 50;
+		this->enemyManager->CreateEnemy<HyperEnemy>(enemyPos, 200);
+		enemyPos.x += 50;
+		this->enemyManager->CreateEnemy<HyperEnemy>(enemyPos, 200);
+		enemyPos.x += 50;
+		this->enemyManager->CreateEnemy<HyperEnemy>(enemyPos, 200);
+		enemyPos.x += 50;
+		this->enemyManager->CreateEnemy<HyperEnemy>(enemyPos, 200);
+		enemyPos.x += 50;
+		this->enemyManager->CreateEnemy<HyperEnemy>(enemyPos, 200);
+		enemyPos.x += 50;
+		this->enemyManager->CreateEnemy<HyperEnemy>(enemyPos, 200);
+		enemyPos.x += 50;
+		this->enemyManager->CreateEnemy<HyperEnemy>(enemyPos, 200);
+		enemyPos.y += 40;
+		enemyPos.x = 20.0;
+		this->enemyManager->CreateEnemy<HyperEnemy>(enemyPos, 200);
+		enemyPos.x += 50;
+		this->enemyManager->CreateEnemy<HyperEnemy>(enemyPos, 200);
+		enemyPos.x += 50;
+		this->enemyManager->CreateEnemy<HyperEnemy>(enemyPos, 200);
+		enemyPos.x += 50;
+		this->enemyManager->CreateEnemy<HyperEnemy>(enemyPos, 200);
+		enemyPos.x += 50;
+		this->enemyManager->CreateEnemy<HyperEnemy>(enemyPos, 200);
+		enemyPos.x += 50;
+		this->enemyManager->CreateEnemy<HyperEnemy>(enemyPos, 200);
+		enemyPos.x += 50;
+		this->enemyManager->CreateEnemy<HyperEnemy>(enemyPos, 200);
+		enemyPos.x += 50;
+		this->enemyManager->CreateEnemy<HyperEnemy>(enemyPos, 200);
+	}
+	
 
 
 	this->resourceManager->LoadRequest(RESOURCE_PLAYER, 0);

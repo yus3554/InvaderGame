@@ -131,6 +131,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\gameActor\actors\enemy\HyperEnemy.cpp" />
     <ClCompile Include="src\ResourceManager.cpp" />
     <ClCompile Include="src\gameActor\actors\player\NormalPlayer.cpp" />
     <ClCompile Include="src\gameActor\actors\shot\NormalShot.cpp" />
@@ -163,6 +164,7 @@
     <ClCompile Include="src\gameScene\scenes\Title.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\gameActor\actors\enemy\HyperEnemy.h" />
     <ClInclude Include="src\ResourceManager.h" />
     <ClInclude Include="src\gameActor\actors\enemy\Enemys.h" />
     <ClInclude Include="src\gameActor\actors\player\NormalPlayer.h" />

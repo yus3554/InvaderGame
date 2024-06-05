@@ -19,5 +19,11 @@ public:
 	RECT GetRect();
 	int GetWidth() const;
 	int GetHeight();
+
+	/// <summary>
+	/// フレームレートで補正されたスピード
+	/// </summary>
+	/// <returns></returns>
+	float GetAdjustSpeed();
 };
 

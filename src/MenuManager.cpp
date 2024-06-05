@@ -2,13 +2,18 @@
 
 
 MenuItem::MenuItem(
-	PCTSTR menuItemName,
 	MenuItemID id
 )
 {
-	this->menuItemName = menuItemName;
+	this->nameList = LinkedList<const char>();
+	this->currentNameIndex = 0;
 	this->id = id;
 	this->selected = false;
+}
+
+void MenuItem::AddName(const char* name)
+{
+	this->nameList.add(name);
 }
 
 bool MenuItem::getSelected()
@@ -29,49 +34,69 @@ MenuItemID MenuItem::getID()
 }
 
 
-PCTSTR MenuItem::getMenuItemName()
+const char* MenuItem::getCurrentMenuItemName()
 {
-	return this->menuItemName;
+	return this->nameList.get(this->currentNameIndex);
+}
+
+void MenuItem::NextNameIndex()
+{
+	this->currentNameIndex = (this->currentNameIndex + 1) % this->nameList.getLength();
+}
+
+int MenuItem::GetCurrentNameIndex()
+{
+	return this->currentNameIndex;
 }
 
 
 MenuManager::MenuManager()
 {
 	// メニューアイテムの初期化
-	this->menuItemsLength = MENU_ITEM_ID_NUM;
-	this->menuItems = (MenuItem**)malloc(sizeof(MenuItem*) * MENU_ITEM_ID_NUM);
-	if (this->menuItems == NULL)
-		throw "menuItemsがNULLです";
+	this->menuList = LinkedList<MenuItem>();
 
-	this->menuItems[MENU_START] = new MenuItem(UI_TEXT_START, MENU_START);
-	this->menuItems[MENU_HIGHSCORE] = new MenuItem(UI_TEXT_HIGHSCORE, MENU_HIGHSCORE);
-	this->menuItems[MENU_QUIT] = new MenuItem(UI_TEXT_QUIT, MENU_QUIT);
+	MenuItem* start = new MenuItem(MENU_START);
+	MenuItem* highscore = new MenuItem(MENU_HIGHSCORE);
+	MenuItem* fps = new MenuItem(MENU_CHANGE_FPS);
+	MenuItem* difficult = new MenuItem(MENU_CHANGE_DIFFICULT);
+	MenuItem* quit = new MenuItem(MENU_QUIT);
+
+	start->AddName(UI_TEXT_START);
+	highscore->AddName(UI_TEXT_HIGHSCORE);
+	fps->AddName("FPS : 60");
+	fps->AddName("FPS : Inf");
+	difficult->AddName("DIFFICULT : Normal");
+	difficult->AddName("DIFFICULT : Hard");
+	quit->AddName(UI_TEXT_QUIT);
+
+	this->menuList.add(start);
+	this->menuList.add(highscore);
+	this->menuList.add(fps);
+	this->menuList.add(difficult);
+	this->menuList.add(quit);
 
 	// カレントアイテムを初期化
 	this->currentID = MENU_START;
-	this->menuItems[this->currentID]->setSelected(true);
+	this->menuList.get(this->currentID)->setSelected(true);
 }
 
 
 MenuManager::~MenuManager()
 {
-	for (int menuItemsIndex = 0; menuItemsIndex < this->menuItemsLength; menuItemsIndex++) {
-		delete this->menuItems[menuItemsIndex];
-	}
-	delete this->menuItems;
+	this->menuList.clear();
 }
 
 
 void MenuManager::setCurrentSelectItems()
 {
-	for (int menuItemIndex = 0; menuItemIndex < MENU_ITEM_ID_NUM; menuItemIndex++)
+	for (int menuItemIndex = 0; menuItemIndex < this->menuList.getLength(); menuItemIndex++)
 	{
-		MenuItem* menuItem = this->menuItems[menuItemIndex];
+		MenuItem* menuItem = this->menuList.get(menuItemIndex);
 		if (menuItem->getID() == this->currentID) {
-			this->menuItems[menuItemIndex]->setSelected(true);
+			menuItem->setSelected(true);
 		}
 		else {
-			this->menuItems[menuItemIndex]->setSelected(false);
+			menuItem->setSelected(false);
 		}
 	}
 }
@@ -108,14 +133,18 @@ MenuItemID MenuManager::getCurrentID()
 	return this->currentID;
 }
 
-
-MenuItem** MenuManager::getMenuItems()
+MenuItem* MenuManager::getCurrentItem()
 {
-	return this->menuItems;
+	return this->menuList.get(this->currentID);
+}
+
+LinkedList<MenuItem>* MenuManager::getMenuList()
+{
+	return &this->menuList;
 }
 
 
-int MenuManager::getMenuItemsLength()
+int MenuManager::getMenuListLength()
 {
-	return this->menuItemsLength;
+	return this->menuList.getLength();
 }

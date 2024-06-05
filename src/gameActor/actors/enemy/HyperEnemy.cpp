@@ -1,11 +1,11 @@
-#include "NormalEnemy.h"
+#include "HyperEnemy.h"
 
-NormalEnemy::NormalEnemy(POINTFLOAT pos, ShotManager* shotManager, Timer* timer, int returnMovementValue)
-	: EnemyBase(pos, 20, 20, 3, shotManager, timer, returnMovementValue)
+HyperEnemy::HyperEnemy(POINTFLOAT pos, ShotManager* shotManager, Timer* timer, int returnMovementValue)
+	: EnemyBase(pos, 20, 20, 6, shotManager, timer, returnMovementValue)
 {
 }
 
-void NormalEnemy::Update()
+void HyperEnemy::Update()
 {
 	if (this->pos.x < this->initPos.x || this->pos.x > this->initPos.x + this->returnMovementValue)
 	{

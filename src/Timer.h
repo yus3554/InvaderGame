@@ -5,9 +5,9 @@ class Timer
 {
 private:
 	/// <summary>
-	/// 目標とするFPS
+	/// 固定FPS
 	/// </summary>
-	int targetFPS;
+	int fixedFPS;
 
 	/// <summary>
 	/// FPSの実測値
@@ -33,13 +33,23 @@ private:
 	/// 今のフレーム
 	/// </summary>
 	int nowFrame;
+	
+	/// <summary>
+	/// 上限解放用FPS
+	/// </summary>
+	int infFPS;
+
+	/// <summary>
+	/// 上限解放FPSを使用するかどうか
+	/// </summary>
+	bool isInfFPS;
 
 public:
 	/// <summary>
 	/// コンストラクタ
 	/// </summary>
-	/// <param name="fps">目標とするFPS</param>
-	Timer(int fps);
+	/// <param name="fps">固定FPS</param>
+	Timer(int fixedFPS);
 
 	/// <summary>
 	/// 前のフレームから現在何フレーム経ったかを取得
@@ -48,10 +58,10 @@ public:
 	int getDiffFrame();
 
 	/// <summary>
-	/// 目標とするFPSを取得
+	/// 固定FPSを取得
 	/// </summary>
-	/// <returns>目標とするFPS</returns>
-	int getTargetFPS() const;
+	/// <returns>固定FPS</returns>
+	int getFixedFPS() const;
 
 	/// <summary>
 	/// FPSの実測値を取得
@@ -64,5 +74,15 @@ public:
 	/// </summary>
 	/// <returns></returns>
 	int getNowFrame() const;
+
+	/// <summary>
+	/// 上限解放させる
+	/// </summary>
+	void UnlockFPS();
+
+	/// <summary>
+	/// 上限解放やめて固定FPSにする
+	/// </summary>
+	void LockFPS();
 };
 

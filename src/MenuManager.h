@@ -1,6 +1,7 @@
 #pragma once
 #include <windows.h>
 #include "Constants.h"
+#include "LinkedList.h"
 
 
 /// <summary>
@@ -17,6 +18,16 @@ enum MenuItemID
 	/// ハイスコア画面
 	/// </summary>
 	MENU_HIGHSCORE,
+
+	/// <summary>
+	/// FPS切り替え
+	/// </summary>
+	MENU_CHANGE_FPS,
+
+	/// <summary>
+	/// 難易度切り替え
+	/// </summary>
+	MENU_CHANGE_DIFFICULT,
 
 	/// <summary>
 	/// ゲーム終了
@@ -36,16 +47,20 @@ enum MenuItemID
 class MenuItem
 {
 private:
-	PCTSTR menuItemName;
+	LinkedList<const char> nameList;
+	int currentNameIndex;
 	MenuItemID id;
 	bool selected;
 
 public:
-	MenuItem(PCTSTR menuName, MenuItemID id);
+	MenuItem(MenuItemID id);
+	void AddName(const char* name);
 	bool getSelected();
 	void setSelected(bool selected);
 	MenuItemID getID();
-	PCTSTR getMenuItemName();
+	const char* getCurrentMenuItemName();
+	void NextNameIndex();
+	int GetCurrentNameIndex();
 };
 
 
@@ -55,8 +70,7 @@ public:
 class MenuManager
 {
 private:
-	int menuItemsLength;
-	MenuItem** menuItems;
+	LinkedList<MenuItem> menuList;
 	MenuItemID currentID;
 	void setCurrentSelectItems();
 
@@ -65,9 +79,10 @@ public:
 	~MenuManager();
 	void nextItem();
 	void previousItem();
+	MenuItem* getCurrentItem();
 	MenuItemID getCurrentID();
-	MenuItem** getMenuItems();
-	int getMenuItemsLength();
+	LinkedList<MenuItem>* getMenuList();
+	int getMenuListLength();
 };
 
 

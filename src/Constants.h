@@ -142,6 +142,24 @@ enum GameState
 	STATE_NUM
 };
 
+enum GameDifficultyState
+{
+	/// <summary>
+	/// normal
+	/// </summary>
+	DIFFICULTY_STATE_NORMAL,
+
+	/// <summary>
+	/// hard
+	/// </summary>
+	DIFFICULTY_STATE_HARD,
+
+	/// <summary>
+	/// ステート数
+	/// </summary>
+	DIFFICULTY_STATE_NUM
+};
+
 /// <summary>
 /// リソース種類
 /// </summary>

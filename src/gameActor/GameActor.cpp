@@ -41,3 +41,8 @@ int GameActor::GetHeight()
 {
 	return this->height;
 }
+
+float GameActor::GetAdjustSpeed()
+{
+	return (FLOAT)(this->speed * 60.0 / this->timer->getRealFPS());
+}
