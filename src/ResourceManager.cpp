@@ -9,8 +9,16 @@ ResourceDataInfo::ResourceDataInfo(ResourceType type, int resourceIndex, bool fo
 
 ResourceData* ResourceDataInfo::Load()
 {
-	char filepath[120] = "";
-	strcpy_s(filepath, RESOURCE_ROOT_FOLDERPATH);
+	char filepath[MAX_PATH] = "";
+
+	// 実行ファイルの場所から相対パス
+	GetModuleFileNameA(NULL,
+		filepath,
+		sizeof(filepath) / sizeof(filepath[0]));
+	PathRemoveFileSpec(filepath);
+	// filepath = "InvaderGame/x64/Debug" + "/../../src/images/"
+	strcat_s(filepath, "/../../src/images/");
+
 	switch (type)
 	{
 	case RESOURCE_BACKGROUND:

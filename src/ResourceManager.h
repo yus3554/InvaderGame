@@ -3,7 +3,8 @@
 #include "Constants.h"
 #include <stdio.h>
 #include <string.h>
-
+#pragma comment(lib, "shlwapi.lib")
+#include <shlwapi.h>
 
 struct ResourceData
 {

@@ -293,8 +293,8 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 					resourceManager.GetResourceData(RESOURCE_BACKGROUND, 0),
 					WND_SIZE.x * backgroundPixelOffset
 				);
-				backgroundPixelOffsetFloat = backgroundPixelOffsetFloat - 60.0 / timer.getRealFPS();
-				backgroundPixelOffset = backgroundPixelOffsetFloat;
+				backgroundPixelOffsetFloat = (float)(backgroundPixelOffsetFloat - 60.0 / timer.getRealFPS());
+				backgroundPixelOffset = (int)backgroundPixelOffsetFloat;
 
 				// FPS•\Ž¦
 				sprintf_s(fpsStr, sizeof(fpsStr), "%5lf FPS", timer.getRealFPS());
