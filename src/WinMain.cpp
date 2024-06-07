@@ -203,6 +203,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 	// レンダラー
 	Renderer renderer = Renderer(hwnd, hInstance, &resourceManager);
 	// 背景pixelOffset用（スクロール）
+	float backgroundPixelOffsetFloat = 0.0;
 	int backgroundPixelOffset = 0;
 
 
@@ -292,7 +293,8 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 					resourceManager.GetResourceData(RESOURCE_BACKGROUND, 0),
 					WND_SIZE.x * backgroundPixelOffset
 				);
-				backgroundPixelOffset--;
+				backgroundPixelOffsetFloat = backgroundPixelOffsetFloat - 60.0 / timer.getRealFPS();
+				backgroundPixelOffset = backgroundPixelOffsetFloat;
 
 				// FPS表示
 				sprintf_s(fpsStr, sizeof(fpsStr), "%5lf FPS", timer.getRealFPS());
