@@ -67,13 +67,34 @@ int Timer::getFixedFPS() const
 
 double Timer::getRealFPS() const
 {
-	return this->realFPS;
+	double realFps = this->realFPS;
+	if (realFPS > 1)
+	{
+		return this->realFPS;
+	}
+	else
+	{
+		return 1;
+	}
+}
+
+LARGE_INTEGER Timer::getCPUFreq() const
+{
+	return this->cpuFreq;
+}
+
+LARGE_INTEGER Timer::getNowCount() const
+{
+	LARGE_INTEGER nowCount;
+	QueryPerformanceCounter(&nowCount);
+	return nowCount;
 }
 
 int Timer::getNowFrame() const
 {
 	return this->nowFrame;
 }
+
 
 void Timer::UnlockFPS()
 {
@@ -83,4 +104,9 @@ void Timer::UnlockFPS()
 void Timer::LockFPS()
 {
 	this->isInfFPS = false;
+}
+
+void Timer::ResetBeforeCount()
+{
+	QueryPerformanceCounter(&beforeCount);
 }

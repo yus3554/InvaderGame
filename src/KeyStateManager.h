@@ -1,6 +1,7 @@
 #pragma once
 #include <windows.h>
 #include "Constants.h"
+#include "Timer.h"
 
 /// <summary>
 /// キーステートを保持するクラス
@@ -9,26 +10,31 @@ class KeyState
 {
 private:
 	/// <summary>
+	/// timer
+	/// </summary>
+	Timer* timer;
+
+	/// <summary>
 	/// 仮想キーコード
 	/// </summary>
 	int keyCode;
 	
 	/// <summary>
-	/// 現在のフレームで押されているかどうか
+	/// 押されている間カウントが進む。
 	/// </summary>
-	bool isDownCurrent;
+	int count;
 
-	/// <summary>
-	/// 前フレームで押されていたかどうか
-	/// </summary>
-	bool isDownBefore;
+	float tempCount;
+
+	int beforeCount;
 
 public:
 	/// <summary>
 	/// コンストラクタ
 	/// </summary>
+	/// <param name="timer">timer</param>
 	/// <param name="keyCode">仮想キーコード</param>
-	KeyState(int keyCode);
+	KeyState(Timer* timer, int keyCode);
 
 	/// <summary>
 	/// 押下されているかを更新する
@@ -40,6 +46,13 @@ public:
 	/// </summary>
 	/// <returns>仮想キーコード</returns>
 	int getKeyCode();
+
+	/// <summary>
+	/// インターバルごとにキーリピートを返す
+	/// </summary>
+	/// <param name="interval">インターバル（秒）</param>
+	/// <returns></returns>
+	bool getIsDownRepeat(float interval);
 
 	/// <summary>
 	/// 現在のフレームで押されているかを取得する
@@ -62,6 +75,11 @@ class KeyStateManager
 {
 private:
 	/// <summary>
+	/// timer
+	/// </summary>
+	Timer* timer;
+
+	/// <summary>
 	/// キーステートの数
 	/// </summary>
 	int statesLength;
@@ -75,7 +93,7 @@ public:
 	/// <summary>
 	/// コンストラクタ
 	/// </summary>
-	KeyStateManager();
+	KeyStateManager(Timer* timer);
 
 	/// <summary>
 	/// デストラクタ

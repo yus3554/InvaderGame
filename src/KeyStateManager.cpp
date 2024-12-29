@@ -1,18 +1,31 @@
 #include "KeyStateManager.h"
 
 
-KeyState::KeyState(int keyCode)
+KeyState::KeyState(Timer* timer, int keyCode)
 {
+	this->timer = timer;
 	this->keyCode = keyCode;
-	this->isDownBefore = false;
-	this->isDownCurrent = false;
+	this->count = 0;
+	this->tempCount = 0.0;
+	this->beforeCount = 0;
 }
 
 
 void KeyState::update()
 {
-	this->isDownBefore = this->isDownCurrent;
-	this->isDownCurrent = KEYDOWN(this->keyCode);
+	if (KEYDOWN(this->keyCode))
+	{
+		this->tempCount += 30 / this->timer->getRealFPS();
+		if (this->tempCount < 1)
+			this->tempCount = 1;
+		this->beforeCount = this->count;
+		this->count = (int)this->tempCount;
+	}
+	else
+	{
+		this->count = 0;
+		this->tempCount = 0.0;
+	}
 }
 
 
@@ -22,20 +35,36 @@ int KeyState::getKeyCode()
 }
 
 
+bool KeyState::getIsDownRepeat(float interval)
+{
+	if ((this->count % (int)(30 * interval)) == 1 && this->count != this->beforeCount)
+	{
+		return true;
+	}
+	return false;
+}
+
+
 bool KeyState::getIsDownCurrent()
 {
-	return this->isDownCurrent;
+	return (this->count > 0);
 }
 
 
 bool KeyState::getIsDownStart()
 {
-	return this->isDownCurrent && !this->isDownBefore;
+	if (this->count == 1 && this->count != this->beforeCount)
+	{
+		return true;
+	}
+	return false;
 }
 
 
-KeyStateManager::KeyStateManager()
+KeyStateManager::KeyStateManager(Timer* timer)
 {
+	this->timer = timer;
+
 	// Žæ“¾‚·‚éƒL[‚Ì‰Šú‰»
 	this->statesLength = KEYCODE_LENGTH;
 	
@@ -45,7 +74,7 @@ KeyStateManager::KeyStateManager()
 	{
 		if (this->states == NULL)
 			throw "states‚ªNULL‚Å‚·";
-		this->states[keyIndex] = new KeyState(KEYCODES[keyIndex]);
+		this->states[keyIndex] = new KeyState(timer, KEYCODES[keyIndex]);
 	}
 }
 

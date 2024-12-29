@@ -17,7 +17,7 @@ void NormalPlayer::Update()
 		this->pos.x += this->GetAdjustSpeed();
 	}
 
-	if (this->keyStateManager->getKeyState(VK_SPACE)->getIsDownStart())
+	if (this->keyStateManager->getKeyState(VK_SPACE)->getIsDownRepeat(0.5))
 	{
 		this->shotManager->CreateShot<NormalShot>(this->pos, true);
 	}

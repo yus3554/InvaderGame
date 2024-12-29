@@ -69,6 +69,10 @@ public:
 	/// <returns>FPSの実測値</returns>
 	double getRealFPS() const;
 
+	LARGE_INTEGER getCPUFreq() const;
+
+	LARGE_INTEGER getNowCount() const;
+
 	/// <summary>
 	/// 現在のフレームを取得
 	/// </summary>
@@ -84,5 +88,10 @@ public:
 	/// 上限解放やめて固定FPSにする
 	/// </summary>
 	void LockFPS();
+
+	/// <summary>
+	/// BeforeCountを現在のカウントにリセットする。
+	/// </summary>
+	void ResetBeforeCount();
 };
 

@@ -8,6 +8,10 @@
 #include "ResourceManager.h"
 
 
+// タイマー
+Timer timer = Timer(60);
+
+
 struct RenderThreadArgs
 {
 	RenderThreadArgs(bool isFor, Renderer* renderer);
@@ -62,6 +66,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		hdc = BeginPaint(hwnd, &ps);
 		EndPaint(hwnd, &ps);
 		return 0;
+
+	case WM_MOVING:
+		// ウィンドウのタイトルバーをマウスでクリックしている間にこのメッセージが飛ぶので、その間タイマーのBeforeカウントを更新し続ける
+		timer.ResetBeforeCount();
 	}
 
 	return DefWindowProc(hwnd, msg, wParam, lParam);
@@ -112,7 +120,6 @@ DWORD WINAPI ResourceLoadThreadFunc(LPVOID lParam)
 	while (args->isFor)
 	{
 		WaitForSingleObject(hEvent, INFINITE);
-		OutputDebugString("a\n");
 
 		// 画像１枚ロード
 		args->manager->LoadOnce();
@@ -186,9 +193,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 	// リソース
 	ResourceManager resourceManager = ResourceManager(&cs);
 	// キーステート
-	KeyStateManager keyStateManager = KeyStateManager();
-	// タイマー
-	Timer timer = Timer(60);
+	KeyStateManager keyStateManager = KeyStateManager(&timer);
 	char fpsStr[100] = "";
 	// ステート管理
 	GameState state = STATE_TITLE;
@@ -253,9 +258,11 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_  HINSTANCE hPrevInstance, 
 	while (true)
 	{
 		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
-			if (msg.message == WM_QUIT) {
+			if (msg.message == WM_QUIT)
+			{
 				break;
 			}
+			
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
